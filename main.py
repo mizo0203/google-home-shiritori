@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
+import logging
 import webapp2
 
 
@@ -19,6 +21,22 @@ class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
         self.response.write('Hello, World!')
+
+    def post(self):
+        json_data = self.request.body
+        obj = json.loads(json_data)
+        logging.info(json.dumps(obj))
+
+        # responseId = obj['responseId']
+        # session = obj['session']
+        queryResult = obj['queryResult']
+        # originalDetectIntentRequest = obj['originalDetectIntentRequest']
+
+        self.response.headers['Content-Type'] = 'application/json'
+        obj = {
+                u'fulfillmentText': queryResult['queryText'],
+                }
+        self.response.write(json.dumps(obj).encode('utf-8'))
 
 
 app = webapp2.WSGIApplication([
