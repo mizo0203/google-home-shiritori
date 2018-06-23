@@ -1,0 +1,81 @@
+# Python CircleCI 2.0 configuration file
+#
+# https://circleci.com/docs/2.0/language-python/
+# https://circleci.com/docs/1.0/deploy-google-app-engine/
+# https://circleci.com/docs/1.0/google-cloud-platform/
+# https://github.com/GoogleCloudPlatform/continuous-deployment-circle
+
+version: 2
+jobs:
+  build:
+    working_directory: ~/repo
+    docker:
+      - image: circleci/python:2.7.15
+    environment:
+      TZ: /usr/share/zoneinfo/Asia/Tokyo
+    steps:
+      - checkout
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: vendor our dependencies
+          command: pip install -r requirements.txt
+      - save_cache:
+          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          paths:
+            - "/usr/local/bin"
+            - "/usr/local/lib/python2.7/site-packages"
+      - run:
+          name: Check PEP 8 for flake8
+          command: flake8 ./ tests --output-file flake8-test-reports
+      - store_artifacts:
+          path: flake8-test-reports
+          destination: flake8-test-reports
+      - run:
+          name: Check Python 2/3 compatible test for pylint
+          command: pylint --py3k ./* tests/* > pylint-test-reports
+      - store_artifacts:
+          path: pylint-test-reports
+          destination: pylint-test-reports
+  deploy:
+    working_directory: ~/repo
+    docker:
+      - image: google/cloud-sdk
+    environment:
+      TZ: /usr/share/zoneinfo/Asia/Tokyo
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{ checksum "requirements.txt" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-
+      - run:
+          name: Retrieve our secrets from the CircleCI environment
+          command: echo $CLIENT_SECRET | base64 --decode > ${HOME}/client-secret.json
+      - run:
+          name: authenticate gcloud
+          command: gcloud auth activate-service-account --key-file ${HOME}/client-secret.json
+      - run:
+          name: config gcloud
+          command: gcloud config set project $GCLOUD_PROJECT
+      - run:
+          name: deploy to AppEngine
+          command: gcloud -q app deploy --version 1
+
+workflows:
+  version: 2
+  check-deply:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: master
