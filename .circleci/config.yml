@@ -38,10 +38,17 @@ jobs:
           destination: flake8-test-reports
       - run:
           name: Check Python 2/3 compatible test for pylint
-          command: pylint --py3k ./* tests/* > pylint-test-reports
+          command: pylint --py3k ./* tests/* > pylint-test-reports 2>&1
       - store_artifacts:
           path: pylint-test-reports
           destination: pylint-test-reports
+      - run:
+          name: Run unittest
+          command: python -m unittest discover -v tests > unittest-test-reports 2>&1
+      - store_artifacts:
+          path: unittest-test-reports
+          destination: unittest-test-reports
+
   deploy:
     working_directory: ~/repo
     docker:
