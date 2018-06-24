@@ -42,6 +42,13 @@ jobs:
       - store_artifacts:
           path: pylint-test-reports
           destination: pylint-test-reports
+      - run:
+          name: Run unittest
+          command: python -m unittest discover -v tests > unittest-test-reports
+      - store_artifacts:
+          path: unittest-test-reports
+          destination: unittest-test-reports
+
   deploy:
     working_directory: ~/repo
     docker:

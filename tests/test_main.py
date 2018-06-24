@@ -16,15 +16,30 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import main
-
+import json
+import unittest
 import webtest
 
+import main
 
-def test_get():
-    app = webtest.TestApp(main.app)
 
-    response = app.get('/')
+class TestWebApp(unittest.TestCase):
+    def test_get(self):
+        app = webtest.TestApp(main.app)
 
-    assert response.status_int == 200
-    assert response.body == 'Hello, World!'
+        response = app.get('/')
+
+        assert response.status_int == 200
+        assert response.body == 'Hello, World!'
+
+    def test_post(self):
+        app = webtest.TestApp(main.app)
+
+        response = app.post_json(
+                    '/',
+                    {'queryResult': {'queryText': 'test code'}},
+                )
+        obj = json.loads(response.body)
+
+        assert response.status_int == 200
+        assert obj['fulfillmentText'] == 'test code'
