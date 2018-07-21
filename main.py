@@ -38,8 +38,12 @@ class MainPage(webapp2.RequestHandler):
 
         self.response.headers['Content-Type'] = 'application/json'
         obj = {
-                u'fulfillmentText': queryResult['queryText'],
-                }
+            u'fulfillmentText': queryResult['queryText'],
+            u'followupEventInput': {
+                u'name': u'ASK_CONTINUE_EVENT',
+                u'languageCode': u'ja',
+            }
+        }
         self.response.write(json.dumps(obj).encode('utf-8'))
 
 
