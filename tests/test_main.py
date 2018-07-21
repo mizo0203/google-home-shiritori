@@ -43,7 +43,8 @@ class TestWebApp(unittest.TestCase):
                     "intent": {
                         "displayName": "Google Assistant Welcome Intent",
                     },
-                    'queryText': 'test code'
+                    'queryText': 'test code',
+                    'languageCode': 'ja',
                 }
             },
         )
@@ -65,7 +66,8 @@ class TestWebApp(unittest.TestCase):
                     "intent": {
                         "displayName": "Ask Continue Intent",
                     },
-                    'queryText': 'test code'
+                    'queryText': 'test code',
+                    'languageCode': 'ja',
                 }
             },
         )
