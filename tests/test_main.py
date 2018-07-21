@@ -32,13 +32,45 @@ class TestWebApp(unittest.TestCase):
         assert response.status_int == 200
         assert response.body == 'Hello, World!'
 
-    def test_post(self):
+    def test_post_google_assistant_welcome_intent(self):
         app = webtest.TestApp(main.app)
 
         response = app.post_json(
-                    '/',
-                    {'queryResult': {'queryText': 'test code'}},
-                )
+            '/',
+            {
+                'queryResult':
+                {
+                    "intent": {
+                        "displayName": "Google Assistant Welcome Intent",
+                    },
+                    'queryText': 'test code',
+                    'languageCode': 'ja',
+                }
+            },
+        )
+        obj = json.loads(response.body)
+
+        assert response.status_int == 200
+        assert obj['fulfillmentText'] == 'test code'
+        assert obj['followupEventInput']['name'] == 'ASK_CONTINUE_EVENT'
+
+    # TODO: Implement test code when Add 'Ask Continue Intent'
+    def test_post_ask_continue_intent(self):
+        app = webtest.TestApp(main.app)
+
+        response = app.post_json(
+            '/',
+            {
+                'queryResult':
+                {
+                    "intent": {
+                        "displayName": "Ask Continue Intent",
+                    },
+                    'queryText': 'test code',
+                    'languageCode': 'ja',
+                }
+            },
+        )
         obj = json.loads(response.body)
 
         assert response.status_int == 200
