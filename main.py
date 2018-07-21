@@ -20,6 +20,8 @@ import json
 import logging
 import webapp2
 
+GOOGLE_ASSISTANT_WELCOME_INTENT = u'Google Assistant Welcome Intent'
+
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
@@ -38,12 +40,12 @@ class MainPage(webapp2.RequestHandler):
         intentDisplayName = queryResult['intent']['displayName']
 
         self.response.headers['Content-Type'] = 'application/json'
-        if intentDisplayName == u'Google Assistant Welcome Intent':
+        if intentDisplayName == GOOGLE_ASSISTANT_WELCOME_INTENT:
             obj = {
                 u'fulfillmentText': queryResult['queryText'],
                 u'followupEventInput': {
                     u'name': u'ASK_CONTINUE_EVENT',
-                    u'languageCode': u'ja',
+                    u'languageCode': queryResult['languageCode'],
                 }
             }
         else:
