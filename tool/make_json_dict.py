@@ -1,4 +1,6 @@
 #!/usr/local/bin/python3
+# -*- coding: UTF-8 -*-
+
 """
 ipadicをjsonの辞書ファイルに変換するスクリプト
 第一引数:読込ファイル
