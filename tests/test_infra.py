@@ -18,21 +18,16 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
-import json
+import unittest
 
-with open('data/dict.json') as json_file:
-    json_dic = json.load(json_file)
+import infra
 
 
-def search_reading_from_dic(search_word):
-    """json形式の辞書ファイルを全探索し、引数の文字列の読みをカタカナで返す
+class TestInfra(unittest.TestCase):
+    def test_search_reading_from_dic(self):
+        assert infra.search_reading_from_dic(u'リンゴ') == u'リンゴ'
+        assert infra.search_reading_from_dic(u'りんご') == u'リンゴ'
+        assert infra.search_reading_from_dic(u'林檎') == u'リンゴ'
 
-    :param str search_word: 検索する文字列
-    :rtype: str
-    :return: 検索した文字列のカタカナ読み(辞書にない場合は'')
-    """
-    for dict_record in json_dic:
-        for word in dict_record['org']:
-            if(word == search_word):
-                return dict_record['key']
-    return ''
+    def test_search_reading_from_dic_none_words(self):
+        assert infra.search_reading_from_dic(u'溝口') == u''
