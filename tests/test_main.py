@@ -53,7 +53,7 @@ class TestWebApp(unittest.TestCase):
         assert obj['fulfillmentText'] == 'test code'
         assert obj['followupEventInput']['name'] == 'ASK_CONTINUE_EVENT'
 
-    # TODO: Ask Continue Intent 対応時にテストコードを実装する
+    # TODO: Implement test code when Add 'Ask Continue Intent'
     def test_post_ask_continue_intent(self):
         app = webtest.TestApp(main.app)
 
