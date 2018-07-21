@@ -35,15 +35,22 @@ class MainPage(webapp2.RequestHandler):
         # session = obj['session']
         queryResult = obj['queryResult']
         # originalDetectIntentRequest = obj['originalDetectIntentRequest']
+        intentDisplayName = queryResult['intent']['displayName']
 
         self.response.headers['Content-Type'] = 'application/json'
-        obj = {
-            u'fulfillmentText': queryResult['queryText'],
-            u'followupEventInput': {
-                u'name': u'ASK_CONTINUE_EVENT',
-                u'languageCode': u'ja',
+        if intentDisplayName == u'Google Assistant Welcome Intent':
+            obj = {
+                u'fulfillmentText': queryResult['queryText'],
+                u'followupEventInput': {
+                    u'name': u'ASK_CONTINUE_EVENT',
+                    u'languageCode': u'ja',
+                }
             }
-        }
+        else:
+            obj = {
+                u'fulfillmentText': queryResult['queryText'],
+            }
+
         self.response.write(json.dumps(obj).encode('utf-8'))
 
 
