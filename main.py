@@ -21,8 +21,14 @@ from __future__ import print_function
 import json
 import logging
 import webapp2
+import infra
 
 GOOGLE_ASSISTANT_WELCOME_INTENT = u'Google Assistant Welcome Intent'
+ASK_CONTINUE_INTENT = u'Ask Continue Intent'
+ASK_WORD_INTENT = u'Ask Word Intent'
+
+ASK_CONTINUE_EVENT = u'ASK_CONTINUE_EVENT'
+ASK_WORD_EVENT = u'ASK_WORD_EVENT'
 
 
 class MainPage(webapp2.RequestHandler):
@@ -44,12 +50,42 @@ class MainPage(webapp2.RequestHandler):
         self.response.headers['Content-Type'] = 'application/json'
         if intentDisplayName == GOOGLE_ASSISTANT_WELCOME_INTENT:
             obj = {
-                u'fulfillmentText': queryResult['queryText'],
                 u'followupEventInput': {
-                    u'name': u'ASK_CONTINUE_EVENT',
+                    u'name': ASK_CONTINUE_EVENT,
                     u'languageCode': queryResult['languageCode'],
                 }
             }
+        elif intentDisplayName == ASK_CONTINUE_INTENT:
+            obj = {
+                u'followupEventInput': {
+                    u'name': ASK_WORD_EVENT,
+                    u'languageCode': queryResult['languageCode'],
+                }
+            }
+        elif intentDisplayName == ASK_WORD_INTENT:
+            queryText = queryResult['queryText']
+            if queryText == ASK_WORD_EVENT:
+                obj = {
+                    u'fulfillmentText': u'しりとり、の、り',
+                }
+            else:
+                logging.info(queryText)
+                reading = infra.search_reading_from_dic(queryText)
+                if reading:
+                    logging.info(reading)
+                    word_record = infra.search_word_record_from_dic(
+                        reading[-1])
+                    logging.info(word_record)
+                    word = word_record['org'][0]
+                    fulfillmentText = word + u'、の、' + word_record['end']
+                    logging.info(word)
+                    obj = {
+                        u'fulfillmentText': fulfillmentText,
+                    }
+                else:
+                    obj = {
+                        u'fulfillmentText': u'それは知らない言葉です',
+                    }
         else:
             obj = {
                 u'fulfillmentText': queryResult['queryText'],
