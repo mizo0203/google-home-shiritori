@@ -118,7 +118,9 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['fulfillmentText'][0] == u'ご'  # 「ご」で始まる単語
+        assert obj['fulfillmentText'][-4] == u'、'
+        assert obj['fulfillmentText'][-3] == u'の'
+        assert obj['fulfillmentText'][-2] == u'、'
 
     def test_post_ask_word_intent_3(self):
         app = webtest.TestApp(main.app)
