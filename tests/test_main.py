@@ -53,10 +53,9 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['fulfillmentText'] == 'test code'
         assert obj['followupEventInput']['name'] == 'ASK_CONTINUE_EVENT'
+        assert obj['followupEventInput']['languageCode'] == 'ja'
 
-    # TODO: Implement test code when Add 'Ask Continue Intent'
     def test_post_ask_continue_intent(self):
         app = webtest.TestApp(main.app)
 
@@ -76,4 +75,68 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['fulfillmentText'] == 'test code'
+        assert obj['followupEventInput']['name'] == 'ASK_WORD_EVENT'
+        assert obj['followupEventInput']['languageCode'] == 'ja'
+
+    def test_post_ask_word_intent_1(self):
+        app = webtest.TestApp(main.app)
+
+        response = app.post_json(
+            '/',
+            {
+                'queryResult':
+                {
+                    "intent": {
+                        "displayName": "Ask Word Intent",
+                    },
+                    'queryText': 'ASK_WORD_EVENT',
+                    'languageCode': 'ja',
+                }
+            },
+        )
+        obj = json.loads(response.body)
+
+        assert response.status_int == 200
+        assert obj['fulfillmentText'] == u'しりとり、の、り'
+
+    def test_post_ask_word_intent_2(self):
+        app = webtest.TestApp(main.app)
+
+        response = app.post_json(
+            '/',
+            {
+                'queryResult':
+                {
+                    "intent": {
+                        "displayName": "Ask Word Intent",
+                    },
+                    'queryText': u'りんご',
+                    'languageCode': 'ja',
+                }
+            },
+        )
+        obj = json.loads(response.body)
+
+        assert response.status_int == 200
+        assert obj['fulfillmentText'][0] == u'ご'  # 「ご」で始まる単語
+
+    def test_post_ask_word_intent_3(self):
+        app = webtest.TestApp(main.app)
+
+        response = app.post_json(
+            '/',
+            {
+                'queryResult':
+                {
+                    "intent": {
+                        "displayName": "Ask Word Intent",
+                    },
+                    'queryText': u'ほげほげ',
+                    'languageCode': 'ja',
+                }
+            },
+        )
+        obj = json.loads(response.body)
+
+        assert response.status_int == 200
+        assert obj['fulfillmentText'] == u'それは知らない言葉です'
