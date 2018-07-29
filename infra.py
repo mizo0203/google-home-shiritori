@@ -33,7 +33,7 @@ def search_reading_from_dic(search_word):
     """
     for dict_record in json_dic:
         for word in dict_record[u'org']:
-            if(word == search_word):
+            if word == search_word:
                 return dict_record[u'key']
     return ''
 
@@ -46,8 +46,8 @@ def search_word_record_from_dic(search_first):
     :return: 検索した単語レコード(辞書にない場合は'')
     """
     for dict_record in json_dic:
-        if(dict_record[u'first'] == search_first):
+        if dict_record[u'first'] == search_first:
             # FIXME: 暫定実装 - 動作確認の都合上、読みの頭と尻は不一致とする
-            if(dict_record[u'end'] != search_first):
+            if dict_record[u'end'] != search_first:
                 return dict_record
     return ''
