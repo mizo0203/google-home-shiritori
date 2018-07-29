@@ -27,8 +27,8 @@ with open('data/dict.json') as json_file:
 def search_reading_from_dic(search_word):
     """json形式の辞書ファイルを全探索し、引数の文字列の読みをカタカナで返す
 
-    :param str search_word: 検索する文字列
-    :rtype: str
+    :param unicode search_word: 検索する文字列
+    :rtype: unicode
     :return: 検索した文字列のカタカナ読み(辞書にない場合は'')
     """
     for dict_record in json_dic:
@@ -41,7 +41,8 @@ def search_reading_from_dic(search_word):
 def search_word_record_from_dic(search_first):
     """json形式の辞書ファイルを全探索し、読みが search_first で始まる適当な単語レコードを返す。
 
-    :param str search_first: カタカナ 1 文字
+    :param unicode search_first: カタカナ 1 文字
+    :rtype: dict
     :return: 検索した単語レコード(辞書にない場合は'')
     """
     for dict_record in json_dic:
