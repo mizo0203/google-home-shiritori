@@ -73,6 +73,7 @@ class MainPage(webapp2.RequestHandler):
                 reading = infra.search_reading_from_dic(queryText)
                 if reading:
                     logging.info(reading)
+                    # FIXME: 暫定実装
                     word_record = infra.search_word_record_from_dic(
                         reading[-1])
                     logging.info(word_record)
