@@ -43,11 +43,11 @@ def search_word_record_from_dic(search_first):
 
     :param unicode search_first: カタカナ 1 文字
     :rtype: dict
-    :return: 検索した単語レコード(辞書にない場合は'')
+    :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """
     for dict_record in json_dic:
         if dict_record[u'first'] == search_first:
             # FIXME: 暫定実装 - 動作確認の都合上、読みの頭と尻は不一致とする
             if dict_record[u'end'] != search_first:
                 return dict_record
-    return ''
+    return {}
