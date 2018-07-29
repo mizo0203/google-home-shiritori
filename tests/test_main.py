@@ -32,7 +32,7 @@ class TestWebApp(unittest.TestCase):
         response = app.get('/')
 
         assert response.status_int == 200
-        assert response.body == 'Hello, World!'
+        assert response.body == u'Hello, World!'
 
     def test_post_google_assistant_welcome_intent(self):
         app = webtest.TestApp(main.app)
@@ -40,21 +40,21 @@ class TestWebApp(unittest.TestCase):
         response = app.post_json(
             '/',
             {
-                'queryResult':
+                u'queryResult':
                 {
-                    "intent": {
-                        "displayName": "Google Assistant Welcome Intent",
+                    u'intent': {
+                        u'displayName': u'Google Assistant Welcome Intent',
                     },
-                    'queryText': 'test code',
-                    'languageCode': 'ja',
+                    u'queryText': u'test code',
+                    u'languageCode': u'ja',
                 }
             },
         )
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['followupEventInput']['name'] == 'ASK_CONTINUE_EVENT'
-        assert obj['followupEventInput']['languageCode'] == 'ja'
+        assert obj[u'followupEventInput'][u'name'] == u'ASK_CONTINUE_EVENT'
+        assert obj[u'followupEventInput'][u'languageCode'] == u'ja'
 
     def test_post_ask_continue_intent(self):
         app = webtest.TestApp(main.app)
@@ -62,21 +62,21 @@ class TestWebApp(unittest.TestCase):
         response = app.post_json(
             '/',
             {
-                'queryResult':
+                u'queryResult':
                 {
-                    "intent": {
-                        "displayName": "Ask Continue Intent",
+                    u'intent': {
+                        u'displayName': u'Ask Continue Intent',
                     },
-                    'queryText': 'test code',
-                    'languageCode': 'ja',
+                    u'queryText': u'test code',
+                    u'languageCode': u'ja',
                 }
             },
         )
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['followupEventInput']['name'] == 'ASK_WORD_EVENT'
-        assert obj['followupEventInput']['languageCode'] == 'ja'
+        assert obj[u'followupEventInput'][u'name'] == u'ASK_WORD_EVENT'
+        assert obj[u'followupEventInput'][u'languageCode'] == u'ja'
 
     def test_post_ask_word_intent_1(self):
         app = webtest.TestApp(main.app)
@@ -84,20 +84,20 @@ class TestWebApp(unittest.TestCase):
         response = app.post_json(
             '/',
             {
-                'queryResult':
+                u'queryResult':
                 {
-                    "intent": {
-                        "displayName": "Ask Word Intent",
+                    u'intent': {
+                        u'displayName': u'Ask Word Intent',
                     },
-                    'queryText': 'ASK_WORD_EVENT',
-                    'languageCode': 'ja',
+                    u'queryText': u'ASK_WORD_EVENT',
+                    u'languageCode': u'ja',
                 }
             },
         )
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['fulfillmentText'] == u'しりとり、の、り'
+        assert obj[u'fulfillmentText'] == u'しりとり、の、り'
 
     def test_post_ask_word_intent_2(self):
         app = webtest.TestApp(main.app)
@@ -105,22 +105,22 @@ class TestWebApp(unittest.TestCase):
         response = app.post_json(
             '/',
             {
-                'queryResult':
+                u'queryResult':
                 {
-                    "intent": {
-                        "displayName": "Ask Word Intent",
+                    u'intent': {
+                        u'displayName': u'Ask Word Intent',
                     },
-                    'queryText': u'りんご',
-                    'languageCode': 'ja',
+                    u'queryText': u'りんご',
+                    u'languageCode': u'ja',
                 }
             },
         )
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['fulfillmentText'][-4] == u'、'
-        assert obj['fulfillmentText'][-3] == u'の'
-        assert obj['fulfillmentText'][-2] == u'、'
+        assert obj[u'fulfillmentText'][-4] == u'、'
+        assert obj[u'fulfillmentText'][-3] == u'の'
+        assert obj[u'fulfillmentText'][-2] == u'、'
 
     def test_post_ask_word_intent_3(self):
         app = webtest.TestApp(main.app)
@@ -128,17 +128,17 @@ class TestWebApp(unittest.TestCase):
         response = app.post_json(
             '/',
             {
-                'queryResult':
+                u'queryResult':
                 {
-                    "intent": {
-                        "displayName": "Ask Word Intent",
+                    u'intent': {
+                        u'displayName': u'Ask Word Intent',
                     },
-                    'queryText': u'ほげほげ',
-                    'languageCode': 'ja',
+                    u'queryText': u'ほげほげ',
+                    u'languageCode': u'ja',
                 }
             },
         )
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj['fulfillmentText'] == u'それは知らない言葉です'
+        assert obj[u'fulfillmentText'] == u'それは知らない言葉です'

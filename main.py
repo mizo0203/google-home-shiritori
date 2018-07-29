@@ -34,7 +34,7 @@ ASK_WORD_EVENT = u'ASK_WORD_EVENT'
 class MainPage(webapp2.RequestHandler):
     def get(self):
         self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write('Hello, World!')
+        self.response.write(u'Hello, World!')
 
     def post(self):
         json_data = self.request.body
@@ -43,27 +43,27 @@ class MainPage(webapp2.RequestHandler):
 
         # responseId = obj['responseId']
         # session = obj['session']
-        queryResult = obj['queryResult']
+        queryResult = obj[u'queryResult']
         # originalDetectIntentRequest = obj['originalDetectIntentRequest']
-        intentDisplayName = queryResult['intent']['displayName']
+        intentDisplayName = queryResult[u'intent'][u'displayName']
 
         self.response.headers['Content-Type'] = 'application/json'
         if intentDisplayName == GOOGLE_ASSISTANT_WELCOME_INTENT:
             obj = {
                 u'followupEventInput': {
                     u'name': ASK_CONTINUE_EVENT,
-                    u'languageCode': queryResult['languageCode'],
+                    u'languageCode': queryResult[u'languageCode'],
                 }
             }
         elif intentDisplayName == ASK_CONTINUE_INTENT:
             obj = {
                 u'followupEventInput': {
                     u'name': ASK_WORD_EVENT,
-                    u'languageCode': queryResult['languageCode'],
+                    u'languageCode': queryResult[u'languageCode'],
                 }
             }
         elif intentDisplayName == ASK_WORD_INTENT:
-            queryText = queryResult['queryText']
+            queryText = queryResult[u'queryText']
             if queryText == ASK_WORD_EVENT:
                 obj = {
                     u'fulfillmentText': u'しりとり、の、り',
@@ -76,8 +76,8 @@ class MainPage(webapp2.RequestHandler):
                     word_record = infra.search_word_record_from_dic(
                         reading[-1])
                     logging.info(word_record)
-                    word = word_record['org'][0]
-                    fulfillmentText = word + u'、の、' + word_record['end']
+                    word = word_record[u'org'][0]
+                    fulfillmentText = word + u'、の、' + word_record[u'end']
                     logging.info(word)
                     obj = {
                         u'fulfillmentText': fulfillmentText,
@@ -88,7 +88,7 @@ class MainPage(webapp2.RequestHandler):
                     }
         else:
             obj = {
-                u'fulfillmentText': queryResult['queryText'],
+                u'fulfillmentText': queryResult[u'queryText'],
             }
 
         self.response.write(json.dumps(obj).encode('utf-8'))
