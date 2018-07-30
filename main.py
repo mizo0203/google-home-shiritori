@@ -21,6 +21,7 @@ from __future__ import print_function
 import json
 import logging
 import webapp2
+
 import infra
 
 GOOGLE_ASSISTANT_WELCOME_INTENT = u'Google Assistant Welcome Intent'
@@ -66,7 +67,7 @@ class MainPage(webapp2.RequestHandler):
             queryText = queryResult[u'queryText']
             if queryText == ASK_WORD_EVENT:
                 obj = {
-                    u'fulfillmentText': u'しりとり、の、り',
+                    u'fulfillmentText': u'しりとり、の、リ',
                 }
             else:
                 logging.info(queryText)
