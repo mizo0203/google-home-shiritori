@@ -19,17 +19,51 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v2-dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v2-dependencies-
+      - run:
+          name: install cache deb file
+          command: |
+            if [[ $(find /home/circleci/apt/archives -name "*.deb") == *".deb"* ]];then
+              sudo dpkg -i /home/circleci/apt/archives/*.deb
+            fi
+      - run:
+          name: install lsb-release and set CLOUD_SDK_REPO
+          command: |
+            sudo apt-get -d install lsb-release
+            if [[ $(find /var/cache/apt/archives -name "*.deb") == *".deb"* ]];then
+              sudo dpkg -i /var/cache/apt/archives/*.deb
+            fi
+            echo 'export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"' >> $BASH_ENV
+      - run:
+          name: install gcloud command and python sdk
+          command: |
+            echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+            curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+            sudo apt-get update
+            sudo apt-get -d install google-cloud-sdk google-cloud-sdk-app-engine-python google-cloud-sdk-app-engine-python-extras
+            if [[ $(find /var/cache/apt/archives -name "*.deb") == *".deb"* ]];then
+              sudo dpkg -i /var/cache/apt/archives/*.deb
+            fi
+            echo 'export PATH=$PATH:/usr/lib/google-cloud-sdk/platform/google_appengine/bin/' >> $BASH_ENV
+            echo 'export PYTHONPATH=$PYTHONPATH:/usr/lib/google-cloud-sdk/platform/google_appengine/' >> $BASH_ENV
       - run:
           name: vendor our dependencies
           command: pip install -r requirements.txt
+      - run:
+          name: copy deb file to cache directory
+          command: |
+            if [[ $(find /var/cache/apt/archives -name "*.deb") == *".deb"* ]];then
+              mkdir -p /home/circleci/apt/archives/
+              cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
+            fi
       - save_cache:
-          key: v1-dependencies-{{ checksum "requirements.txt" }}
+          key: v2-dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}
           paths:
             - "/usr/local/bin"
             - "/usr/local/lib/python2.7/site-packages"
+            - "/home/circleci/apt/archives/"
       - run:
           name: Check PEP 8 for flake8
           command: flake8 ./ tests --output-file flake8-test-reports
@@ -59,9 +93,9 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}
+            - v2-dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}
             # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
+            - v2-dependencies-
       - run:
           name: Retrieve our secrets from the CircleCI environment
           command: echo $CLIENT_SECRET | base64 --decode > ${HOME}/client-secret.json

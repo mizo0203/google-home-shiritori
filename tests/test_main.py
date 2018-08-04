@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from google.appengine.ext import testbed
+
 import json
 import unittest
 import webtest
@@ -26,6 +28,15 @@ import main
 
 
 class TestWebApp(unittest.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
     def test_get(self):
         app = webtest.TestApp(main.app)
 
@@ -47,6 +58,16 @@ class TestWebApp(unittest.TestCase):
                     },
                     u'queryText': u'test code',
                     u'languageCode': u'ja',
+                },
+                u'originalDetectIntentRequest':
+                {
+                    u'payload':
+                    {
+                        u'user':
+                        {
+                            u'userId': u'TestId'
+                        }
+                    }
                 }
             },
         )
@@ -69,6 +90,16 @@ class TestWebApp(unittest.TestCase):
                     },
                     u'queryText': u'test code',
                     u'languageCode': u'ja',
+                },
+                u'originalDetectIntentRequest':
+                {
+                    u'payload':
+                    {
+                        u'user':
+                        {
+                            u'userId': u'TestId'
+                        }
+                    }
                 }
             },
         )
@@ -91,6 +122,16 @@ class TestWebApp(unittest.TestCase):
                     },
                     u'queryText': u'ASK_WORD_EVENT',
                     u'languageCode': u'ja',
+                },
+                u'originalDetectIntentRequest':
+                {
+                    u'payload':
+                    {
+                        u'user':
+                        {
+                            u'userId': u'TestId'
+                        }
+                    }
                 }
             },
         )
@@ -112,6 +153,16 @@ class TestWebApp(unittest.TestCase):
                     },
                     u'queryText': u'りんご',
                     u'languageCode': u'ja',
+                },
+                u'originalDetectIntentRequest':
+                {
+                    u'payload':
+                    {
+                        u'user':
+                        {
+                            u'userId': u'TestId'
+                        }
+                    }
                 }
             },
         )
@@ -135,6 +186,16 @@ class TestWebApp(unittest.TestCase):
                     },
                     u'queryText': u'ほげほげ',
                     u'languageCode': u'ja',
+                },
+                u'originalDetectIntentRequest':
+                {
+                    u'payload':
+                    {
+                        u'user':
+                        {
+                            u'userId': u'TestId'
+                        }
+                    }
                 }
             },
         )

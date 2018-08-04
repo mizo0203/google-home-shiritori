@@ -18,10 +18,51 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from google.appengine.ext import ndb
+
 import json
 
 with open('data/dict.json') as json_file:
     json_dic = json.load(json_file)
+
+
+class User(ndb.Model):
+    words = ndb.TextProperty()
+    last_word = ndb.TextProperty()
+    count = ndb.IntegerProperty()
+    date = ndb.DateTimeProperty(auto_now_add=True)
+
+
+def reset_datastore(user_id):
+    try:
+        user = User.get_by_id(user_id)
+        user.key.delete()
+    except Exception:
+        pass
+
+
+def check_word_datastore(user_id, check_word):
+    try:
+        user = User.get_by_id(user_id)
+        words = user.words.split(u',')
+        if check_word in words:
+            return False
+        return True
+    except Exception:
+        return True
+
+
+def save_word_datastore(user_id, save_word):
+    try:
+        user = User.get_by_id(user_id)
+        user.words += u',' + save_word
+        user.count += 1
+    except Exception:
+        user = User(id=user_id)
+        user.words = save_word
+        user.count = 1
+    user.last_word = save_word
+    user.put()
 
 
 def search_reading_from_dic(search_word):
@@ -35,7 +76,7 @@ def search_reading_from_dic(search_word):
         for word in dict_record[u'org']:
             if word == search_word:
                 return dict_record[u'key']
-    return ''
+    return u''
 
 
 def search_word_record_from_dic(search_first):
