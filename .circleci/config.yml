@@ -10,13 +10,13 @@ jobs:
   build:
     working_directory: ~/repo
     docker:
-      - image: circleci/python:2.7.15
+      - image: google/cloud-sdk
     environment:
       TZ: /usr/share/zoneinfo/Asia/Tokyo
+      # https://stackoverflow.com/questions/15783783/python-import-error-no-module-named-appengine-ext
+      PYTHONPATH: /usr/lib/google-cloud-sdk/platform/google_appengine:/usr/lib/google-cloud-sdk/platform/google_appengine/lib/:/usr/lib/google-cloud-sdk/platform/google_appengine/lib/yaml/
     steps:
       - checkout
-      - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - restore_cache:
           keys:
             - v2-dependencies-{{ .Branch }}-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}
