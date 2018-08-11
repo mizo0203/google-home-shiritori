@@ -21,6 +21,7 @@ from __future__ import print_function
 from google.appengine.ext import ndb
 
 import json
+import random
 
 with open('data/dict.json') as json_file:
     json_dic = json.load(json_file)
@@ -79,16 +80,27 @@ def search_reading_from_dic(search_word):
     return u''
 
 
-def search_word_record_from_dic(search_first):
+def search_word_record_from_dic(user_id, search_first):
     """json形式の辞書ファイルを全探索し、読みが search_first で始まる適当な単語レコードを返す。
+    無効な単語（既出の単語・存在しない単語・「ん」で終わる単語）のレコードは返さない。
 
     :param unicode search_first: カタカナ 1 文字
     :rtype: dict
     :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """
+    dict_record_list = []
     for dict_record in json_dic:
-        if dict_record[u'first'] == search_first:
-            # FIXME: 暫定実装 - 動作確認の都合上、読みの頭と尻は不一致とする
-            if dict_record[u'end'] != search_first:
-                return dict_record
-    return {}
+        # search_first で始まる単語レコードを検索する
+        if dict_record[u'first'] != search_first:
+            continue
+        # 「ん」で終わる単語は除外する
+        if dict_record[u'end'] == u'ン':
+            continue
+        # Google Home は既出の単語を言わない
+        if not check_word_datastore(user_id, dict_record[u'key']):
+            continue
+        dict_record_list.append(dict_record)
+    if dict_record_list:
+        return dict_record_list[random.randint(0, len(dict_record_list) - 1)]
+    else:
+        return {}
