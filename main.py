@@ -30,6 +30,7 @@ ASK_WORD_INTENT = u'Ask Word Intent'
 
 ASK_CONTINUE_EVENT = u'ASK_CONTINUE_EVENT'
 ASK_WORD_EVENT = u'ASK_WORD_EVENT'
+DECLARE_USER_LOSE_EVENT = u'DECLARE_USER_LOSE_EVENT'
 
 
 class MainPage(webapp2.RequestHandler):
@@ -74,9 +75,17 @@ class MainPage(webapp2.RequestHandler):
                 logging.info(queryText)
                 reading = infra.search_reading_from_dic(queryText)
                 if reading:
-                    if infra.check_word_datastore(userId, reading):
+                    logging.info(reading)
+                    reading_end = reading[-1]
+                    if reading_end == u'ン':
+                        obj = {
+                            u'followupEventInput': {
+                                u'name': DECLARE_USER_LOSE_EVENT,
+                                u'languageCode': queryResult[u'languageCode'],
+                            }
+                        }
+                    elif infra.check_word_datastore(userId, reading):
                         infra.save_word_datastore(userId, reading)
-                        logging.info(reading)
                         # FIXME: 暫定実装
                         word_record = infra.search_word_record_from_dic(
                             reading[-1])
