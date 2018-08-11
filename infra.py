@@ -42,6 +42,25 @@ def reset_datastore(user_id):
         pass
 
 
+def get_last_word_datastore(user_id):
+    try:
+        user = User.get_by_id(user_id)
+        if user.last_word == u'':
+            return u'リ'
+        return user.last_word[-1]
+    except Exception:
+        return u'リ'
+
+
+def check_last_word_datastore(user_id, check_word):
+    try:
+        if check_word[0] == get_last_word_datastore(user_id):
+            return True
+        return False
+    except Exception:
+        return True
+
+
 def check_word_datastore(user_id, check_word):
     try:
         user = User.get_by_id(user_id)
