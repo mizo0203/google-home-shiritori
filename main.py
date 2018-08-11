@@ -86,13 +86,13 @@ class MainPage(webapp2.RequestHandler):
                         }
                     elif infra.check_word_datastore(userId, reading):
                         infra.save_word_datastore(userId, reading)
-                        # FIXME: 暫定実装
                         word_record = infra.search_word_record_from_dic(
-                            reading[-1])
+                            userId, reading[-1])
                         logging.info(word_record)
                         word = word_record[u'org'][0]
+                        infra.save_word_datastore(userId, word_record[u'key'])
                         fulfillmentText = word + u'、の、' + word_record[u'end']
-                        logging.info(word)
+                        logging.info(fulfillmentText)
                         obj = {
                             u'fulfillmentText': fulfillmentText,
                         }
