@@ -77,28 +77,34 @@ class MainPage(webapp2.RequestHandler):
                 if reading:
                     logging.info(reading)
                     reading_end = reading[-1]
-                    if reading_end == u'ン':
-                        obj = {
-                            u'followupEventInput': {
-                                u'name': DECLARE_USER_LOSE_EVENT,
-                                u'languageCode': queryResult[u'languageCode'],
+                    if infra.check_last_word_datastore(userId, reading):
+                        if reading_end == u'ン':
+                            infra.reset_datastore(userId)
+                            obj = {
+                                u'followupEventInput': {
+                                    u'name': DECLARE_USER_LOSE_EVENT,
+                                    u'languageCode': queryResult[u'languageCode'],
+                                }
                             }
-                        }
-                    elif infra.check_word_datastore(userId, reading):
-                        infra.save_word_datastore(userId, reading)
-                        word_record = infra.search_word_record_from_dic(
-                            userId, reading[-1])
-                        logging.info(word_record)
-                        word = word_record[u'org'][0]
-                        infra.save_word_datastore(userId, word_record[u'key'])
-                        fulfillmentText = word + u'、の、' + word_record[u'end']
-                        logging.info(fulfillmentText)
-                        obj = {
-                            u'fulfillmentText': fulfillmentText,
-                        }
+                        elif infra.check_word_datastore(userId, reading):
+                            infra.save_word_datastore(userId, reading)
+                            word_record = infra.search_word_record_from_dic(
+                                userId, reading_end)
+                            logging.info(word_record)
+                            word = word_record[u'org'][0]
+                            infra.save_word_datastore(userId, word_record[u'key'])
+                            fulfillmentText = word + u'、の、' + word_record[u'end']
+                            logging.info(fulfillmentText)
+                            obj = {
+                                u'fulfillmentText': fulfillmentText,
+                            }
+                        else:
+                            obj = {
+                                u'fulfillmentText': u'それは使用済みの言葉です',
+                            }
                     else:
                         obj = {
-                            u'fulfillmentText': u'それは使用済みの言葉です',
+                            u'fulfillmentText': infra.get_last_word_datastore(userId) + u'で始まる言葉を使ってください',
                         }
                 else:
                     obj = {
