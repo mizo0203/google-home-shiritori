@@ -23,6 +23,10 @@ from google.appengine.ext import ndb
 import json
 import random
 
+# しりとりが WORDS_COUNT_LIMIT 以上続いたら AI が降参する
+WORDS_COUNT_LIMIT = 10
+
+
 with open('data/dict.json') as json_file:
     json_dic = json.load(json_file)
 
@@ -34,36 +38,51 @@ class User(ndb.Model):
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 
-def reset_datastore(user_id):
+def load_user(user_id):
     try:
         user = User.get_by_id(user_id)
+        if user:
+            return user
+    except Exception:
+        pass
+
+    user = User(id=user_id)
+    user.words = None
+    user.last_word = None
+    user.count = 0
+    user.date = None
+    return user
+
+
+def reset_datastore(user):
+    try:
         user.key.delete()
+        user.words = None
+        user.last_word = None
+        user.count = 0
+        user.date = None
     except Exception:
         pass
 
 
-def get_last_word_datastore(user_id):
+def get_last_word_datastore(user):
     try:
-        user = User.get_by_id(user_id)
-        if user.last_word == u'':
-            return u'リ'
         return user.last_word[-1]
     except Exception:
-        return u'リ'
+        pass
 
 
-def check_last_word_datastore(user_id, check_word):
+def check_last_word_datastore(user, check_word):
     try:
-        if check_word[0] == get_last_word_datastore(user_id):
+        if check_word[0] == get_last_word_datastore(user):
             return True
         return False
     except Exception:
         return True
 
 
-def check_word_datastore(user_id, check_word):
+def check_word_datastore(user, check_word):
     try:
-        user = User.get_by_id(user_id)
         words = user.words.split(u',')
         if check_word in words:
             return False
@@ -72,15 +91,15 @@ def check_word_datastore(user_id, check_word):
         return True
 
 
-def save_word_datastore(user_id, save_word):
+def save_word_datastore(user, save_word):
     try:
-        user = User.get_by_id(user_id)
-        user.words += u',' + save_word
+        if user.words:
+            user.words += u',' + save_word
+        else:
+            user.words = save_word
         user.count += 1
     except Exception:
-        user = User(id=user_id)
-        user.words = save_word
-        user.count = 1
+        pass
     user.last_word = save_word
     user.put()
 
@@ -99,7 +118,7 @@ def search_reading_from_dic(search_word):
     return u''
 
 
-def search_word_record_from_dic(user_id, search_first):
+def search_word_record_from_dic(user, search_first):
     """json形式の辞書ファイルを全探索し、読みが search_first で始まる適当な単語レコードを返す。
     無効な単語（既出の単語・存在しない単語・「ん」で終わる単語）のレコードは返さない。
 
@@ -116,10 +135,42 @@ def search_word_record_from_dic(user_id, search_first):
         if dict_record[u'end'] == u'ン':
             continue
         # Google Home は既出の単語を言わない
-        if not check_word_datastore(user_id, dict_record[u'key']):
+        if not check_word_datastore(user, dict_record[u'key']):
             continue
         dict_record_list.append(dict_record)
     if dict_record_list:
         return dict_record_list[random.randint(0, len(dict_record_list) - 1)]
     else:
         return {}
+
+
+def search_lose_word_record_from_dic(user, search_first):
+    """json形式の辞書ファイルを全探索し、読みが search_first で始まり
+    かつ、「ん」で終わる単語レコードを返す。
+
+    :param unicode search_first: カタカナ 1 文字
+    :rtype: dict
+    :return: 検索した単語レコード(辞書にない場合は空の辞書)
+    """
+    dict_record_list = []
+    for dict_record in json_dic:
+        # search_first で始まる単語レコードを検索する
+        if dict_record[u'first'] != search_first:
+            continue
+        # 「ん」で終わる単語を検索する
+        if dict_record[u'end'] == u'ン':
+            dict_record_list.append(dict_record)
+    if dict_record_list:
+        return dict_record_list[random.randint(0, len(dict_record_list) - 1)]
+    else:
+        return {}
+
+
+def is_need_google_home_lose(user):
+    """Google Home の負け処理が必要であるかを返す。
+
+    :param infra.User user: ユーザ
+    :rtype: bool
+    :return: Google Home の負け処理が必要であるか
+    """
+    return user.count >= WORDS_COUNT_LIMIT

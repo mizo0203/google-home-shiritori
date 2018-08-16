@@ -27,6 +27,7 @@ import domain
 GOOGLE_ASSISTANT_WELCOME_INTENT = u'Google Assistant Welcome Intent'
 ASK_CONTINUE_INTENT = u'Ask Continue Intent'
 ASK_WORD_INTENT = u'Ask Word Intent'
+DECLARE_GOOGLE_HOME_LOSE_INTENT = u'Declare Google Home Lose Intent'
 
 
 class MainPage(webapp2.RequestHandler):
@@ -51,6 +52,8 @@ class MainPage(webapp2.RequestHandler):
             obj = domain.set_continue(obj)
         elif intentDisplayName == ASK_WORD_INTENT:
             obj = domain.response_word(obj)
+        elif intentDisplayName == DECLARE_GOOGLE_HOME_LOSE_INTENT:
+            obj = domain.response_lose_word(obj)
         else:
             obj = {
                 u'fulfillmentText': queryResult[u'queryText'],
