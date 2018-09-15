@@ -38,7 +38,7 @@ class User(ndb.Model):
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 
-def load_user(user_id):
+def load_user(user_id, default_last_word):
     try:
         user = User.get_by_id(user_id)
         if user:
@@ -51,6 +51,7 @@ def load_user(user_id):
     user.last_word = None
     user.count = 0
     user.date = None
+    save_word_datastore(user, default_last_word)
     return user
 
 

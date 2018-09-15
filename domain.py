@@ -27,6 +27,8 @@ ASK_WORD_EVENT = u'ASK_WORD_EVENT'
 DECLARE_USER_LOSE_EVENT = u'DECLARE_USER_LOSE_EVENT'
 DECLARE_GOOGLE_HOME_LOSE_EVENT = u'DECLARE_GOOGLE_HOME_LOSE_EVENT'
 
+DATASTORE_DEFAULT_LAST_WORD = u'シリトリ'
+
 
 def ask_continue(obj):
     queryResult = obj[u'queryResult']
@@ -54,11 +56,11 @@ def response_word(obj):
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
     queryText = queryResult[u'queryText']
 
-    user = infra.load_user(userId)
+    user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
 
     if queryText == ASK_WORD_EVENT:
         infra.reset_datastore(user)
-        infra.save_word_datastore(user, u'シリトリ')
+        user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
         return {
             u'fulfillmentText': u'しりとり、の、リ',
         }
@@ -115,7 +117,7 @@ def response_lose_word(obj):
     originalDetectIntentRequest = obj['originalDetectIntentRequest']
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
 
-    user = infra.load_user(userId)
+    user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
     reading_end = user.last_word[-1]
 
     word_record = infra.search_lose_word_record_from_dic(
