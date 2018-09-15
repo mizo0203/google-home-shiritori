@@ -74,7 +74,7 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj[u'followupEventInput'][u'name'] == u'ASK_CONTINUE_EVENT'
+        assert obj[u'followupEventInput'][u'name'] == u'ASK_WORD_EVENT'
         assert obj[u'followupEventInput'][u'languageCode'] == u'ja'
 
     def test_post_ask_continue_intent(self):
@@ -89,6 +89,9 @@ class TestWebApp(unittest.TestCase):
                         u'displayName': u'Ask Continue Intent',
                     },
                     u'queryText': u'test code',
+                    u'parameters': {
+                        u'startMode': u'NEW_GAME'
+                    },
                     u'languageCode': u'ja',
                 },
                 u'originalDetectIntentRequest':
@@ -138,7 +141,7 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj[u'fulfillmentText'] == u'しりとり、の、リ'
+        assert obj[u'fulfillmentText'] == u'シリトリ、の、リ'
 
     def test_post_ask_word_intent_2(self):
         app = webtest.TestApp(main.app)
