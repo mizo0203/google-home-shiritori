@@ -31,7 +31,10 @@ for key in sorted(inputData.keys()):
     data['key'] = key
     data['org'] = inputData[key]
     data['first'] = key[0]
-    data['end'] = key[-1]
+    if key[-1] == u'ー':
+        data['end'] = key[-2]
+    else:
+        data['end'] = key[-1]
     outputData.append(data)
 
 with open(sys.argv[2], 'w') as wf:
