@@ -35,6 +35,24 @@ for key in sorted(inputData.keys()):
         data['end'] = key[-2]
     else:
         data['end'] = key[-1]
+    if data['end'] == u'ァ':
+        data['end'] = u'ア'
+    elif data['end'] == u'ィ':
+        data['end'] = u'イ'
+    elif data['end'] == u'ゥ':
+        data['end'] = u'ウ'
+    elif data['end'] == u'ェ':
+        data['end'] = u'エ'
+    elif data['end'] == u'ォ':
+        data['end'] = u'オ'
+    elif data['end'] == u'ャ':
+        data['end'] = u'ヤ'
+    elif data['end'] == u'ュ':
+        data['end'] = u'ユ'
+    elif data['end'] == u'ョ':
+        data['end'] = u'ヨ'
+    elif data['end'] == u'ッ':
+        data['end'] = u'ツ'
     outputData.append(data)
 
 with open(sys.argv[2], 'w') as wf:
