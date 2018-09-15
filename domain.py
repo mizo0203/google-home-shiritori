@@ -29,19 +29,45 @@ DECLARE_GOOGLE_HOME_LOSE_EVENT = u'DECLARE_GOOGLE_HOME_LOSE_EVENT'
 
 DATASTORE_DEFAULT_LAST_WORD = u'シリトリ'
 
+PARAM_START_MODE_NEW_GAME = u'NEW_GAME'
+PARAM_START_MODE_CONTINUE = u'CONTINUE'
+
 
 def ask_continue(obj):
+    originalDetectIntentRequest = obj['originalDetectIntentRequest']
+    userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
     queryResult = obj[u'queryResult']
-    return {
-        u'followupEventInput': {
-            u'name': ASK_CONTINUE_EVENT,
-            u'languageCode': queryResult[u'languageCode'],
+
+    if infra.contains_user(userId):
+        return {
+            u'followupEventInput': {
+                u'name': ASK_CONTINUE_EVENT,
+                u'languageCode': queryResult[u'languageCode'],
+            }
         }
-    }
+    else:
+        return {
+            u'followupEventInput': {
+                u'name': ASK_WORD_EVENT,
+                u'languageCode': queryResult[u'languageCode'],
+            }
+        }
 
 
 def set_continue(obj):
     queryResult = obj[u'queryResult']
+    startMode = queryResult[u'parameters'][u'startMode']
+    if startMode == PARAM_START_MODE_NEW_GAME:
+        logging.info(PARAM_START_MODE_NEW_GAME)
+        originalDetectIntentRequest = obj['originalDetectIntentRequest']
+        userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
+        user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
+        infra.reset_datastore(user)
+    elif startMode == PARAM_START_MODE_CONTINUE:
+        logging.info(PARAM_START_MODE_CONTINUE)
+    else:
+        Exception(u"Unknown startMode: " + startMode)
+
     return {
         u'followupEventInput': {
             u'name': ASK_WORD_EVENT,
@@ -59,10 +85,9 @@ def response_word(obj):
     user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
 
     if queryText == ASK_WORD_EVENT:
-        infra.reset_datastore(user)
-        user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
         return {
-            u'fulfillmentText': u'しりとり、の、リ',
+            u'fulfillmentText': user.last_word + u'、の、' + user.last_word[-1],
+            # FIXME: #414, #427                             ^^^^^^^^^^^^^^^^^^
         }
     else:
         logging.info(queryText)
@@ -119,6 +144,7 @@ def response_lose_word(obj):
 
     user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
     reading_end = user.last_word[-1]
+    # FIXME: #414, #427 ^^^^^^^^^^^^
 
     word_record = infra.search_lose_word_record_from_dic(
         user, reading_end)
