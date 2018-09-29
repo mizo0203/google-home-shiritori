@@ -10,6 +10,11 @@ ipadicをjsonの辞書ファイルに変換するスクリプト
 import json
 import sys
 
+LOWER_CASE = {u'ァ': u'ア', u'ィ': u'イ', u'ゥ': u'ウ', u'ェ': u'エ', u'ォ': u'オ',
+              u'ャ': u'ヤ', u'ュ': u'ユ', u'ョ': u'ヨ', u'ヮ': u'ワ',
+              u'ッ': u'ツ',
+              }
+
 with open(sys.argv[1]) as f:
     inputData = {}
     for line in f:
@@ -35,24 +40,8 @@ for key in sorted(inputData.keys()):
         data['end'] = key[-2]
     else:
         data['end'] = key[-1]
-    if data['end'] == u'ァ':
-        data['end'] = u'ア'
-    elif data['end'] == u'ィ':
-        data['end'] = u'イ'
-    elif data['end'] == u'ゥ':
-        data['end'] = u'ウ'
-    elif data['end'] == u'ェ':
-        data['end'] = u'エ'
-    elif data['end'] == u'ォ':
-        data['end'] = u'オ'
-    elif data['end'] == u'ャ':
-        data['end'] = u'ヤ'
-    elif data['end'] == u'ュ':
-        data['end'] = u'ユ'
-    elif data['end'] == u'ョ':
-        data['end'] = u'ヨ'
-    elif data['end'] == u'ッ':
-        data['end'] = u'ツ'
+    if data['end'] in LOWER_CASE:
+        data['end'] = LOWER_CASE[data['end']]
     outputData.append(data)
 
 with open(sys.argv[2], 'w') as wf:
