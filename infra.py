@@ -21,6 +21,7 @@ from __future__ import print_function
 from google.appengine.ext import ndb
 
 import json
+import logging
 import random
 
 # しりとりが WORDS_COUNT_LIMIT 以上続いたら AI が降参する
@@ -49,19 +50,18 @@ def contains_user(user_id):
     return False
 
 
-def load_user(user_id, default_last_word):
+def load_user(user_id, default_last_word=u'シリトリ'):
     try:
         user = User.get_by_id(user_id)
         if user:
             return user
-    except Exception:
-        pass
+    except Exception as e:
+        logging.exception(u'load_user: %s', e)
 
     user = User(id=user_id)
-    user.words = None
-    user.last_word = None
+    user.words = u''
+    user.last_word = u''
     user.count = 0
-    user.date = None
     save_word_datastore(user, default_last_word)
     return user
 
@@ -69,12 +69,8 @@ def load_user(user_id, default_last_word):
 def reset_datastore(user):
     try:
         user.key.delete()
-        user.words = None
-        user.last_word = None
-        user.count = 0
-        user.date = None
-    except Exception:
-        pass
+    except Exception as e:
+        logging.exception(u'reset_datastore: %s', e)
 
 
 def get_last_word_datastore(user):
@@ -82,26 +78,42 @@ def get_last_word_datastore(user):
         return user.last_word[-1]
         # FIXME: #414, #427 ^^^^^
     except Exception:
-        pass
+        raise
 
 
 def check_last_word_datastore(user, check_word):
+    """check_word がしりとりで最後に使用した単語に続くかを判定する
+
+    :param infra.User user: ユーザ
+    :param unicode check_word: 検索するカタカナの文字列
+    :rtype: unicode
+    :return: 最後に使用した単語に続けられるなら True, 続けられないなら False
+    """
     try:
         if check_word[0] == get_last_word_datastore(user):
             return True
-        return False
+        else:
+            return False
     except Exception:
-        return True
+        raise
 
 
 def check_word_datastore(user, check_word):
+    """しりとりで未使用の単語であるかを判定する
+
+    :param infra.User user: ユーザ
+    :param unicode check_word: 検索するカタカナの文字列
+    :rtype: unicode
+    :return: 未使用であれば True, 使用済みであれば False
+    """
     try:
         words = user.words.split(u',')
         if check_word in words:
             return False
-        return True
+        else:
+            return True
     except Exception:
-        return True
+        raise
 
 
 def save_word_datastore(user, save_word):
@@ -112,7 +124,7 @@ def save_word_datastore(user, save_word):
             user.words = save_word
         user.count += 1
     except Exception:
-        pass
+        raise
     user.last_word = save_word
     user.put()
 
