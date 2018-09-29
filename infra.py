@@ -22,6 +22,7 @@ from google.appengine.ext import ndb
 
 import json
 import random
+import logging
 
 # しりとりが WORDS_COUNT_LIMIT 以上続いたら AI が降参する
 WORDS_COUNT_LIMIT = 10
@@ -44,15 +45,13 @@ def load_user(user_id, default_last_word):
         if user:
             return user
     except Exception:
-        pass
-
-    user = User(id=user_id)
-    user.words = None
-    user.last_word = None
-    user.count = 0
-    user.date = None
-    save_word_datastore(user, default_last_word)
-    return user
+        user = User(id=user_id)
+        user.words = None
+        user.last_word = None
+        user.count = 0
+        user.date = None
+        save_word_datastore(user, default_last_word)
+        return user
 
 
 def reset_datastore(user):
@@ -62,34 +61,50 @@ def reset_datastore(user):
         user.last_word = None
         user.count = 0
         user.date = None
-    except Exception:
-        pass
+    except Exception, e:
+        logging.exception(u"reset_datastore: ", e)
 
 
 def get_last_word_datastore(user):
     try:
         return user.last_word[-1]
     except Exception:
-        pass
+        raise
 
 
 def check_last_word_datastore(user, check_word):
+    """check_word がしりとりで最後に使用した単語に続くかを判定する
+
+    :param infra.User user: ユーザ
+    :param unicode check_word: 検索するカタカナの文字列
+    :rtype: unicode
+    :return: 最後に使用した単語に続けられるなら True, 続けられないなら False
+    """
     try:
         if check_word[0] == get_last_word_datastore(user):
             return True
-        return False
+        else:
+            return False
     except Exception:
-        return True
+        raise
 
 
 def check_word_datastore(user, check_word):
+    """しりとりで未使用の単語であるかを判定する
+
+    :param infra.User user: ユーザ
+    :param unicode check_word: 検索するカタカナの文字列
+    :rtype: unicode
+    :return: 未使用であれば True, 使用済みであれば False
+    """
     try:
         words = user.words.split(u',')
         if check_word in words:
             return False
-        return True
+        else:
+            return True
     except Exception:
-        return True
+        raise
 
 
 def save_word_datastore(user, save_word):
@@ -100,7 +115,7 @@ def save_word_datastore(user, save_word):
             user.words = save_word
         user.count += 1
     except Exception:
-        pass
+        raise
     user.last_word = save_word
     user.put()
 
