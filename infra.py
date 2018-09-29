@@ -39,6 +39,17 @@ class User(ndb.Model):
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 
+def contains_user(user_id):
+    try:
+        user = User.get_by_id(user_id)
+        if user:
+            return True
+    except Exception as e:
+        logging.exception(u'contains_user: %s', e)
+
+    return False
+
+
 def load_user(user_id, default_last_word=u'シリトリ'):
     try:
         user = User.get_by_id(user_id)
@@ -79,6 +90,7 @@ def get_datastore(user_id):
 def get_last_word_datastore(user):
     try:
         return user.last_word[-1]
+        # FIXME: #414, #427 ^^^^^
     except Exception:
         raise
 
