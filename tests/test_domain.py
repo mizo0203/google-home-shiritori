@@ -37,7 +37,7 @@ class TestDomain(unittest.TestCase):
         self.testbed.deactivate()
 
     def test_response_word_inner(self):
-        user = infra.load_user(u'TestId', u'シリトリ')
+        user = infra.load_user(u'TestId')
 
         obj = domain.response_word_inner({
             u'queryResult':
