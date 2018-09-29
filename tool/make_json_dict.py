@@ -10,6 +10,11 @@ ipadicをjsonの辞書ファイルに変換するスクリプト
 import json
 import sys
 
+LOWER_CASE = {u'ァ': u'ア', u'ィ': u'イ', u'ゥ': u'ウ', u'ェ': u'エ', u'ォ': u'オ',
+              u'ャ': u'ヤ', u'ュ': u'ユ', u'ョ': u'ヨ', u'ヮ': u'ワ',
+              u'ッ': u'ツ',
+              }
+
 with open(sys.argv[1]) as f:
     inputData = {}
     for line in f:
@@ -31,7 +36,12 @@ for key in sorted(inputData.keys()):
     data['key'] = key
     data['org'] = inputData[key]
     data['first'] = key[0]
-    data['end'] = key[-1]
+    if key[-1] == u'ー':
+        data['end'] = key[-2]
+    else:
+        data['end'] = key[-1]
+    if data['end'] in LOWER_CASE:
+        data['end'] = LOWER_CASE[data['end']]
     outputData.append(data)
 
 with open(sys.argv[2], 'w') as wf:
