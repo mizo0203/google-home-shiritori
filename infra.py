@@ -39,30 +39,27 @@ class User(ndb.Model):
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 
-def load_user(user_id, default_last_word):
+def load_user(user_id, default_last_word=u'シリトリ'):
     try:
         user = User.get_by_id(user_id)
         if user:
             return user
-    except Exception:
-        user = User(id=user_id)
-        user.words = None
-        user.last_word = None
-        user.count = 0
-        user.date = None
-        save_word_datastore(user, default_last_word)
-        return user
+    except Exception as e:
+        logging.exception(u'load_user: %s', e)
+
+    user = User(id=user_id)
+    user.words = u''
+    user.last_word = u''
+    user.count = 0
+    save_word_datastore(user, default_last_word)
+    return user
 
 
 def reset_datastore(user):
     try:
         user.key.delete()
-        user.words = None
-        user.last_word = None
-        user.count = 0
-        user.date = None
-    except Exception, e:
-        logging.exception(u"reset_datastore: ", e)
+    except Exception as e:
+        logging.exception(u'reset_datastore: %s', e)
 
 
 def get_last_word_datastore(user):
