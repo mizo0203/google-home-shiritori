@@ -26,8 +26,7 @@ import domain
 
 class TestDomain(unittest.TestCase):
     def test_response_word_inner(self):
-        user = infra.User(id=u'TestId')
-        infra.save_word_datastore(user, u'シリトリ')
+        user = infra.load_user(u'TestId', u'シリトリ')
 
         obj = domain.response_word_inner({
             u'queryResult':
