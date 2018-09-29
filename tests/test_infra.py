@@ -25,9 +25,9 @@ import infra
 
 class TestInfra(unittest.TestCase):
     def test_search_reading_from_dic(self):
-        assert infra.search_reading_from_dic(u'リンゴ') == u'リンゴ'
-        assert infra.search_reading_from_dic(u'りんご') == u'リンゴ'
-        assert infra.search_reading_from_dic(u'林檎') == u'リンゴ'
+        assert infra.search_reading_from_dic(u'リンゴ')[u'key'] == u'リンゴ'
+        assert infra.search_reading_from_dic(u'りんご')[u'key'] == u'リンゴ'
+        assert infra.search_reading_from_dic(u'林檎')[u'key'] == u'リンゴ'
 
     def test_search_reading_from_dic_none_words(self):
-        assert infra.search_reading_from_dic(u'溝口') == u''
+        assert infra.search_reading_from_dic(u'溝口') == {}

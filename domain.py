@@ -27,8 +27,6 @@ ASK_WORD_EVENT = u'ASK_WORD_EVENT'
 DECLARE_USER_LOSE_EVENT = u'DECLARE_USER_LOSE_EVENT'
 DECLARE_GOOGLE_HOME_LOSE_EVENT = u'DECLARE_GOOGLE_HOME_LOSE_EVENT'
 
-DATASTORE_DEFAULT_LAST_WORD = u'シリトリ'
-
 PARAM_START_MODE_NEW_GAME = u'NEW_GAME'
 PARAM_START_MODE_CONTINUE = u'CONTINUE'
 
@@ -61,7 +59,7 @@ def set_continue(obj):
         logging.info(PARAM_START_MODE_NEW_GAME)
         originalDetectIntentRequest = obj['originalDetectIntentRequest']
         userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
-        user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
+        user = infra.load_user(userId)
         infra.reset_datastore(user)
     elif startMode == PARAM_START_MODE_CONTINUE:
         logging.info(PARAM_START_MODE_CONTINUE)
@@ -79,7 +77,7 @@ def set_continue(obj):
 def response_word(obj):
     originalDetectIntentRequest = obj['originalDetectIntentRequest']
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
-    user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
+    user = infra.load_user(userId)
     return response_word_inner(obj, user)
 
 
@@ -89,17 +87,17 @@ def response_word_inner(obj, user):
 
     if queryText == ASK_WORD_EVENT:
         return {
-            u'fulfillmentText': user.last_word + u'、の、' + user.last_word[-1],
-            # FIXME: #414, #427                             ^^^^^^^^^^^^^^^^^^
+            u'fulfillmentText': user.last_word + u'、の、' + user.last_word_end,
         }
     else:
         logging.info(queryText)
-        reading = infra.search_reading_from_dic(queryText)
-        if reading:
-            logging.info(reading)
-            reading_end = reading[-1]
-            if infra.check_last_word_datastore(user, reading):
-                if reading_end == u'ン':
+        req_word_record = infra.search_reading_from_dic(queryText)
+        if req_word_record:
+            req_word_reading = req_word_record[u'key']
+            logging.info(req_word_reading)
+            req_word_reading_end = req_word_record[u'end']
+            if infra.check_last_word_datastore(user, req_word_reading):
+                if req_word_reading_end == u'ン':
                     infra.reset_datastore(user)
                     return {
                         u'followupEventInput': {
@@ -107,8 +105,8 @@ def response_word_inner(obj, user):
                             u'languageCode': queryResult[u'languageCode'],
                         }
                     }
-                elif infra.check_word_datastore(user, reading):
-                    infra.save_word_datastore(user, reading)
+                elif infra.check_word_datastore(user, req_word_reading):
+                    infra.save_word_datastore(user, req_word_record)
                     if infra.is_need_google_home_lose(user):
                         return {
                             u'followupEventInput': {
@@ -117,12 +115,13 @@ def response_word_inner(obj, user):
                             }
                         }
                     else:
-                        word_record = infra.search_word_record_from_dic(
-                            user, reading_end)
-                        logging.info(word_record)
-                        word = word_record[u'org'][0]
-                        infra.save_word_datastore(user, word_record[u'key'])
-                        fulfillmentText = word + u'、の、' + word_record[u'end']
+                        resp_word_record = infra.search_word_record_from_dic(
+                            user, req_word_reading_end)
+                        logging.info(resp_word_record)
+                        word = resp_word_record[u'org'][0]
+                        infra.save_word_datastore(user, resp_word_record)
+                        fulfillmentText = word + u'、の、' + \
+                            resp_word_record[u'end']
                         logging.info(fulfillmentText)
                         return {
                             u'fulfillmentText': fulfillmentText,
@@ -145,9 +144,8 @@ def response_lose_word(obj):
     originalDetectIntentRequest = obj['originalDetectIntentRequest']
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
 
-    user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
-    reading_end = user.last_word[-1]
-    # FIXME: #414, #427 ^^^^^^^^^^^^
+    user = infra.load_user(userId)
+    reading_end = user.last_word_end
 
     word_record = infra.search_lose_word_record_from_dic(
         user, reading_end)
@@ -155,7 +153,7 @@ def response_lose_word(obj):
     fulfillmentText = u''
     if word_record:
         word = word_record[u'org'][0]
-        infra.save_word_datastore(user, word_record[u'key'])
+        infra.save_word_datastore(user, word_record)
         fulfillmentText += word + u'。'
         fulfillmentText += u'あら、「ん」で終わってしまいました。'
     else:

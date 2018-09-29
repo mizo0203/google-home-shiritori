@@ -35,6 +35,7 @@ with open('data/dict.json') as json_file:
 class User(ndb.Model):
     words = ndb.TextProperty()
     last_word = ndb.TextProperty()
+    last_word_end = ndb.TextProperty()
     count = ndb.IntegerProperty()
     date = ndb.DateTimeProperty(auto_now_add=True)
 
@@ -61,8 +62,10 @@ def load_user(user_id, default_last_word=u'シリトリ'):
     user = User(id=user_id)
     user.words = u''
     user.last_word = u''
+    user.last_word_end = u''
     user.count = 0
-    save_word_datastore(user, default_last_word)
+    word_record = search_reading_from_dic(default_last_word)
+    save_word_datastore(user, word_record)
     return user
 
 
@@ -79,6 +82,7 @@ def get_datastore(user_id):
         if user:
             obj = {u'words': user.words,
                    u'last_word': user.last_word,
+                   u'last_word_end': user.last_word_end,
                    u'count': user.count,
                    }
             return obj
@@ -89,8 +93,7 @@ def get_datastore(user_id):
 
 def get_last_word_datastore(user):
     try:
-        return user.last_word[-1]
-        # FIXME: #414, #427 ^^^^^
+        return user.last_word_end
     except Exception:
         raise
 
@@ -130,31 +133,34 @@ def check_word_datastore(user, check_word):
         raise
 
 
-def save_word_datastore(user, save_word):
+def save_word_datastore(user, save_word_record):
     try:
         if user.words:
-            user.words += u',' + save_word
+            user.words += u',' + save_word_record[u'key']
         else:
-            user.words = save_word
+            user.words = save_word_record[u'key']
         user.count += 1
     except Exception:
         raise
-    user.last_word = save_word
+    user.last_word = save_word_record[u'key']
+    user.last_word_end = save_word_record[u'end']
     user.put()
 
 
 def search_reading_from_dic(search_word):
-    """json形式の辞書ファイルを全探索し、引数の文字列の読みをカタカナで返す
+    """json形式の辞書ファイルを全探索し、引数の文字列を含む単語レコードを返す。
 
     :param unicode search_word: 検索する文字列
     :rtype: unicode
-    :return: 検索した文字列のカタカナ読み(辞書にない場合は'')
+    :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """
     for dict_record in json_dic:
+        if dict_record[u'key'] == search_word:
+            return dict_record
         for word in dict_record[u'org']:
             if word == search_word:
-                return dict_record[u'key']
-    return u''
+                return dict_record
+    return {}
 
 
 def search_word_record_from_dic(user, search_first):
