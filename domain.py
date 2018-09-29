@@ -52,11 +52,16 @@ def set_continue(obj):
 
 def response_word(obj):
     originalDetectIntentRequest = obj['originalDetectIntentRequest']
+    userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
+    user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
+    return response_word_inner(obj, user)
+
+
+def response_word_inner(obj, user):
+    originalDetectIntentRequest = obj['originalDetectIntentRequest']
     queryResult = obj[u'queryResult']
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
     queryText = queryResult[u'queryText']
-
-    user = infra.load_user(userId, DATASTORE_DEFAULT_LAST_WORD)
 
     if queryText == ASK_WORD_EVENT:
         infra.reset_datastore(user)
