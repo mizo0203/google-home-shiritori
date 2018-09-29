@@ -140,39 +140,6 @@ class TestWebApp(unittest.TestCase):
         assert response.status_int == 200
         assert obj[u'fulfillmentText'] == u'しりとり、の、リ'
 
-    def test_post_ask_word_intent_2(self):
-        app = webtest.TestApp(main.app)
-
-        response = app.post_json(
-            '/',
-            {
-                u'queryResult':
-                {
-                    u'intent': {
-                        u'displayName': u'Ask Word Intent',
-                    },
-                    u'queryText': u'りんご',
-                    u'languageCode': u'ja',
-                },
-                u'originalDetectIntentRequest':
-                {
-                    u'payload':
-                    {
-                        u'user':
-                        {
-                            u'userId': u'TestId'
-                        }
-                    }
-                }
-            },
-        )
-        obj = json.loads(response.body)
-
-        assert response.status_int == 200
-        assert obj[u'fulfillmentText'][-4] == u'、'
-        assert obj[u'fulfillmentText'][-3] == u'の'
-        assert obj[u'fulfillmentText'][-2] == u'、'
-
     def test_post_ask_word_intent_3(self):
         app = webtest.TestApp(main.app)
 
