@@ -18,6 +18,8 @@ from __future__ import absolute_import
 from __future__ import division
 from __future__ import print_function
 
+from google.appengine.ext import testbed
+
 import unittest
 
 import infra
@@ -25,6 +27,15 @@ import domain
 
 
 class TestDomain(unittest.TestCase):
+    def setUp(self):
+        self.testbed = testbed.Testbed()
+        self.testbed.activate()
+        self.testbed.init_datastore_v3_stub()
+        self.testbed.init_memcache_stub()
+
+    def tearDown(self):
+        self.testbed.deactivate()
+
     def test_response_word_inner(self):
         user = infra.load_user(u'TestId', u'シリトリ')
 
