@@ -62,6 +62,20 @@ def reset_datastore(user):
         logging.exception(u'reset_datastore: %s', e)
 
 
+def get_datastore(user_id):
+    try:
+        user = User.get_by_id(user_id)
+        if user:
+            obj = {u'words': user.words,
+                   u'last_word': user.last_word,
+                   u'count': user.count,
+                   }
+            return obj
+    except Exception as e:
+        logging.exception(u'get_datasore: %s', e)
+    return {}
+
+
 def get_last_word_datastore(user):
     try:
         return user.last_word[-1]
