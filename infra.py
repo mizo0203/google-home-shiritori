@@ -21,6 +21,7 @@ from __future__ import print_function
 from google.appengine.ext import ndb
 
 import json
+import logging
 import random
 
 # しりとりが WORDS_COUNT_LIMIT 以上続いたら AI が降参する
@@ -67,13 +68,16 @@ def reset_datastore(user):
 
 
 def get_datastore(user_id):
-    user = User.get_by_id(user_id)
-    if user:
-        obj = {u'words': user.words,
-               u'last_word': user.last_word,
-               u'count': user.count,
-               }
-        return obj
+    try:
+        user = User.get_by_id(user_id)
+        if user:
+            obj = {u'words': user.words,
+                   u'last_word': user.last_word,
+                   u'count': user.count,
+                   }
+            return obj
+    except Exception as e:
+        logging.exception(u'get_datasore: %s', e)
     return {}
 
 
