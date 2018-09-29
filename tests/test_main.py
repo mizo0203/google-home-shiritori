@@ -40,10 +40,11 @@ class TestWebApp(unittest.TestCase):
     def test_get(self):
         app = webtest.TestApp(main.app)
 
-        response = app.get('/')
+        response = app.get('/?id=TestId')
+        obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert response.body == u'Hello, World!'
+        assert obj == {}
 
     def test_post_google_assistant_welcome_intent(self):
         app = webtest.TestApp(main.app)

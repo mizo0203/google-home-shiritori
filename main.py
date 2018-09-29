@@ -23,6 +23,7 @@ import logging
 import webapp2
 
 import domain
+import infra
 
 GOOGLE_ASSISTANT_WELCOME_INTENT = u'Google Assistant Welcome Intent'
 ASK_CONTINUE_INTENT = u'Ask Continue Intent'
@@ -32,8 +33,10 @@ DECLARE_GOOGLE_HOME_LOSE_INTENT = u'Declare Google Home Lose Intent'
 
 class MainPage(webapp2.RequestHandler):
     def get(self):
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.write(u'Hello, World!')
+        userId = self.request.get('id')
+        obj = infra.get_datastore(userId)
+        self.response.headers['Content-Type'] = 'application/json'
+        self.response.write(json.dumps(obj).encode('utf-8'))
 
     def post(self):
         json_data = self.request.body

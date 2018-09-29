@@ -66,6 +66,17 @@ def reset_datastore(user):
         pass
 
 
+def get_datastore(user_id):
+    user = User.get_by_id(user_id)
+    if user:
+        obj = {u'words': user.words,
+               u'last_word': user.last_word,
+               u'count': user.count,
+               }
+        return obj
+    return {}
+
+
 def get_last_word_datastore(user):
     try:
         return user.last_word[-1]
