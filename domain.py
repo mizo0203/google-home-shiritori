@@ -66,7 +66,7 @@ def set_continue(obj):
     elif startMode == PARAM_START_MODE_CONTINUE:
         logging.info(PARAM_START_MODE_CONTINUE)
     else:
-        Exception(u"Unknown startMode: " + startMode)
+        raise RuntimeError(u"Unknown startMode: " + startMode)
 
     return {
         u'followupEventInput': {

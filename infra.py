@@ -44,8 +44,8 @@ def contains_user(user_id):
         user = User.get_by_id(user_id)
         if user:
             return True
-    except Exception:
-        pass
+    except Exception as e:
+        logging.exception(u'contains_user: %s', e)
 
     return False
 
