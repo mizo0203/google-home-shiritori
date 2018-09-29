@@ -51,7 +51,7 @@ def contains_user(user_id):
     return False
 
 
-def load_user(user_id, default_last_word=u'尻取り'):
+def load_user(user_id, default_last_word=u'シリトリ'):
     try:
         user = User.get_by_id(user_id)
         if user:
@@ -155,6 +155,8 @@ def search_reading_from_dic(search_word):
     :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """
     for dict_record in json_dic:
+        if dict_record[u'key'] == search_word:
+            return dict_record
         for word in dict_record[u'org']:
             if word == search_word:
                 return dict_record
