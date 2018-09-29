@@ -21,8 +21,8 @@ from __future__ import print_function
 from google.appengine.ext import ndb
 
 import json
-import random
 import logging
+import random
 
 # しりとりが WORDS_COUNT_LIMIT 以上続いたら AI が降参する
 WORDS_COUNT_LIMIT = 10
