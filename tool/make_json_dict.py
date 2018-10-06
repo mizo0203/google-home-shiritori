@@ -15,7 +15,7 @@ LOWER_CASE = {u'ァ': u'ア', u'ィ': u'イ', u'ゥ': u'ウ', u'ェ': u'エ', u'
               u'ッ': u'ツ',
               }
 
-CONVERSION_TABLE = {u'ヂ': u'ジ', u'ヅ': u'ズ',}
+CONVERSION_TABLE = {u'ヂ': u'ジ', u'ヅ': u'ズ', }
 
 with open(sys.argv[1]) as f:
     inputData = {}
