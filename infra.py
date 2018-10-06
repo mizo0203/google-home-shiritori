@@ -62,6 +62,7 @@ def load_user(user_id, default_last_word=u'シリトリ'):
 
     user = User(id=user_id)
     user.words = u''
+    user.org_words = u''
     user.last_word = u''
     user.last_word_end = u''
     user.count = 0
