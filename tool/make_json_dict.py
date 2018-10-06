@@ -15,6 +15,8 @@ LOWER_CASE = {u'ァ': u'ア', u'ィ': u'イ', u'ゥ': u'ウ', u'ェ': u'エ', u'
               u'ッ': u'ツ',
               }
 
+CONVERSION_TABLE = {u'ヂ': u'ジ', u'ヅ': u'ズ', }
+
 with open(sys.argv[1]) as f:
     inputData = {}
     for line in f:
@@ -42,6 +44,10 @@ for key in sorted(inputData.keys()):
         data['end'] = key[-1]
     if data['end'] in LOWER_CASE:
         data['end'] = LOWER_CASE[data['end']]
+    if data['first'] in CONVERSION_TABLE:
+        data['first'] = CONVERSION_TABLE[data['first']]
+    if data['end'] in CONVERSION_TABLE:
+        data['end'] = CONVERSION_TABLE[data['end']]
     outputData.append(data)
 
 with open(sys.argv[2], 'w') as wf:
