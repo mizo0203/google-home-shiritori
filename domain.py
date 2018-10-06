@@ -96,7 +96,7 @@ def response_word_inner(obj, user):
             req_word_reading = req_word_record[u'key']
             logging.info(req_word_reading)
             req_word_reading_end = req_word_record[u'end']
-            if infra.check_last_word_datastore(user, req_word_reading):
+            if infra.check_last_word_datastore(user, req_word_record):
                 if req_word_reading_end == u'ン':
                     infra.reset_datastore(user)
                     return {
