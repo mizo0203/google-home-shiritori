@@ -142,7 +142,7 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj[u'fulfillmentText'] == u'シリトリ、の、リ'
+        assert obj[u'fulfillmentText'] == u'尻取り、の、リ'
 
     def test_post_ask_word_intent_3(self):
         app = webtest.TestApp(main.app)
