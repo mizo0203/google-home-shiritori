@@ -34,6 +34,7 @@ with open('data/dict.json') as json_file:
 
 class User(ndb.Model):
     words = ndb.TextProperty()
+    org_words = ndb.TextProperty()
     last_word = ndb.TextProperty()
     last_word_end = ndb.TextProperty()
     count = ndb.IntegerProperty()
@@ -81,6 +82,7 @@ def get_datastore(user_id):
         user = User.get_by_id(user_id)
         if user:
             obj = {u'words': user.words,
+                   u'org_words': user.org_words,
                    u'last_word': user.last_word,
                    u'last_word_end': user.last_word_end,
                    u'count': user.count,
@@ -137,12 +139,14 @@ def save_word_datastore(user, save_word_record):
     try:
         if user.words:
             user.words += u',' + save_word_record[u'key']
+            user.org_words += u',' + save_word_record[u'org'][0]
         else:
             user.words = save_word_record[u'key']
+            user.org_words = save_word_record[u'org'][0]
         user.count += 1
     except Exception:
         raise
-    user.last_word = save_word_record[u'key']
+    user.last_word = save_word_record[u'org'][0]
     user.last_word_end = save_word_record[u'end']
     user.put()
 
