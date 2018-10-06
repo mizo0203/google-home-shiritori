@@ -36,6 +36,10 @@ def ask_continue(obj):
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
     queryResult = obj[u'queryResult']
 
+    user = infra.load_user(userId)
+    if user.last_word_end == u'ン' or user.words == u'シリトリ':
+        infra.reset_datastore(user)
+
     if infra.contains_user(userId):
         return {
             u'followupEventInput': {
@@ -97,17 +101,16 @@ def response_word_inner(obj, user):
             logging.info(req_word_reading)
             req_word_reading_end = req_word_record[u'end']
             if infra.check_last_word_datastore(user, req_word_record):
-                if req_word_reading_end == u'ン':
-                    infra.reset_datastore(user)
-                    return {
-                        u'followupEventInput': {
-                            u'name': DECLARE_USER_LOSE_EVENT,
-                            u'languageCode': queryResult[u'languageCode'],
-                        }
-                    }
-                elif infra.check_word_datastore(user, req_word_reading):
+                if infra.check_word_datastore(user, req_word_reading):
                     infra.save_word_datastore(user, req_word_record)
-                    if infra.is_need_google_home_lose(user):
+                    if req_word_reading_end == u'ン':
+                        return {
+                            u'followupEventInput': {
+                                u'name': DECLARE_USER_LOSE_EVENT,
+                                u'languageCode': queryResult[u'languageCode'],
+                            }
+                        }
+                    elif infra.is_need_google_home_lose(user):
                         return {
                             u'followupEventInput': {
                                 u'name': DECLARE_GOOGLE_HOME_LOSE_EVENT,
@@ -160,7 +163,6 @@ def response_lose_word(obj):
         fulfillmentText += u'うーん、「' + reading_end + u'」で始まる言葉が思いつきません。'
     fulfillmentText += u'私の負けです。'
     logging.info(fulfillmentText)
-    infra.reset_datastore(user)
     return {
         u'fulfillmentText': fulfillmentText,
     }
