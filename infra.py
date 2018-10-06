@@ -30,6 +30,14 @@ WORDS_COUNT_LIMIT = 10
 
 with open('data/dict.json') as json_file:
     json_dic = json.load(json_file)
+    json_start_word_dic = json.loads('''
+    [{
+        "key": "シリトリ",
+        "org": ["尻取り"],
+        "first": "シ",
+        "end": "リ"
+    }]''')
+    json_dic.extend(json_start_word_dic)
 
 
 class User(ndb.Model):
@@ -105,12 +113,12 @@ def check_last_word_datastore(user, check_word):
     """check_word がしりとりで最後に使用した単語に続くかを判定する
 
     :param infra.User user: ユーザ
-    :param unicode check_word: 検索するカタカナの文字列
+    :param unicode check_word: 検索する単語のrecord
     :rtype: unicode
     :return: 最後に使用した単語に続けられるなら True, 続けられないなら False
     """
     try:
-        if check_word[0] == get_last_word_datastore(user):
+        if check_word[u'first'] == get_last_word_datastore(user):
             return True
         else:
             return False
