@@ -39,14 +39,15 @@ REQUEST_URL = URL + PARAMETER + ID
 REQUEST_INTERVAL = 10.0
 
 
-def convertWords2Text(words):
+def convertWords2Text(obj):
+    org_word_list = obj['org_words'].split(',')
+    word_list = obj['words'].split(',')
     out_text = ''
-    word_list = words.split(',')
-    for i, v in enumerate(word_list):
+    for i in range(len(word_list)):
         if i % 2 == 0:
-            out_text = u'AI  :' + v + u'\n' + out_text
+            out_text = u'AI  :' + org_word_list[i] + u'（' + word_list[i] + u'）\n' + out_text
         else:
-            out_text = u'User:' + v + u'\n' + out_text
+            out_text = u'User:' + org_word_list[i] + u'（' + word_list[i] + u'）\n' + out_text
     return out_text
 
 
@@ -73,7 +74,7 @@ class ShiritoriDisplayWidget(Widget):
                 self.word = obj['last_word']
                 self.word_end = obj['last_word_end']
                 self.count = str(obj['count']) + u'回目'
-                self.word_list = convertWords2Text(obj['words'])
+                self.word_list = convertWords2Text(obj)
 
     def on_command(self, command):
         if command == 'start/stop':
