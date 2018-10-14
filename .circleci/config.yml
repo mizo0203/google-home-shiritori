@@ -36,7 +36,7 @@ jobs:
               # Delete the version number from file name and overwrite the latest .deb file.
               # ex) google-cloud-sdk-app-engine-python-extras_220.0.0-0_all.deb
               # --> google-cloud-sdk-app-engine-python-extras.deb
-              rename s/_.*$/.deb/ /var/cache/apt/archives/*.deb
+              sudo rename s/_.*$/.deb/ /var/cache/apt/archives/*.deb
               cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
             fi
             echo 'export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"' >> $BASH_ENV
@@ -53,7 +53,7 @@ jobs:
               # Delete the version number from file name and overwrite the latest .deb file.
               # ex) google-cloud-sdk-app-engine-python-extras_220.0.0-0_all.deb
               # --> google-cloud-sdk-app-engine-python-extras.deb
-              rename s/_.*$/.deb/ /var/cache/apt/archives/*.deb
+              sudo rename s/_.*$/.deb/ /var/cache/apt/archives/*.deb
               cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
             fi
             echo 'export PATH=$PATH:/usr/lib/google-cloud-sdk/platform/google_appengine/bin/' >> $BASH_ENV
