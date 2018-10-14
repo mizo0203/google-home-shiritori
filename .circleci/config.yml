@@ -27,13 +27,17 @@ jobs:
               sudo dpkg -i /home/circleci/apt/archives/*.deb
             fi
       - run:
-          name: install lsb-release and set CLOUD_SDK_REPO
+          name: install lsb-release, rename and set CLOUD_SDK_REPO
           command: |
-            sudo apt -d install lsb-release
+            sudo apt -d install lsb-release rename
             if [[ $(find /var/cache/apt/archives -name "*.deb") == *".deb"* ]];then
-              mkdir -p /home/circleci/apt/archives/
-              cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
               sudo dpkg -i /var/cache/apt/archives/*.deb
+              mkdir -p /home/circleci/apt/archives/
+              # Delete the version number from file name and overwrite the latest .deb file.
+              # ex) google-cloud-sdk-app-engine-python-extras_220.0.0-0_all.deb
+              # --> google-cloud-sdk-app-engine-python-extras.deb
+              sudo rename s/_.*$/.deb/ /var/cache/apt/archives/*.deb
+              cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
             fi
             echo 'export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)"' >> $BASH_ENV
       - run:
@@ -44,9 +48,13 @@ jobs:
             sudo apt update
             sudo apt -d install google-cloud-sdk google-cloud-sdk-app-engine-python google-cloud-sdk-app-engine-python-extras
             if [[ $(find /var/cache/apt/archives -name "*.deb") == *".deb"* ]];then
-              mkdir -p /home/circleci/apt/archives/
-              cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
               sudo dpkg -i /var/cache/apt/archives/*.deb
+              mkdir -p /home/circleci/apt/archives/
+              # Delete the version number from file name and overwrite the latest .deb file.
+              # ex) google-cloud-sdk-app-engine-python-extras_220.0.0-0_all.deb
+              # --> google-cloud-sdk-app-engine-python-extras.deb
+              sudo rename s/_.*$/.deb/ /var/cache/apt/archives/*.deb
+              cp -r /var/cache/apt/archives/*.deb /home/circleci/apt/archives/
             fi
             echo 'export PATH=$PATH:/usr/lib/google-cloud-sdk/platform/google_appengine/bin/' >> $BASH_ENV
             echo 'export PYTHONPATH=$PYTHONPATH:/usr/lib/google-cloud-sdk/platform/google_appengine/' >> $BASH_ENV
