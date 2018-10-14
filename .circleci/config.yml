@@ -27,9 +27,9 @@ jobs:
               sudo dpkg -i /home/circleci/apt/archives/*.deb
             fi
       - run:
-          name: install lsb-release and set CLOUD_SDK_REPO
+          name: install lsb-release, rename and set CLOUD_SDK_REPO
           command: |
-            sudo apt -d install lsb-release
+            sudo apt -d install lsb-release rename
             if [[ $(find /var/cache/apt/archives -name "*.deb") == *".deb"* ]];then
               sudo dpkg -i /var/cache/apt/archives/*.deb
               mkdir -p /home/circleci/apt/archives/
