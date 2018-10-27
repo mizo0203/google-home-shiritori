@@ -2,7 +2,7 @@
 # -*- coding: UTF-8 -*-
 
 """
-ipadicをjsonの辞書ファイルに変換するスクリプト
+入力ファイルをjsonの辞書ファイルに変換するスクリプト
 第一引数:読込ファイル
 第二引数:出力ファイル
 """
@@ -26,13 +26,54 @@ VOICED_SOUND_MARK = {u'ヴ': u'ウ',
                      u'パ': u'ハ', u'ピ': u'ヒ', u'プ': u'フ', u'ペ': u'ヘ', u'ポ': u'ホ',
                      }
 
+HIRAGANA_TO_KATAKANA = {
+    u'ぁ': u'ァ', u'あ': u'ア', u'ぃ': u'ィ', u'い': u'イ', u'ぅ': u'ゥ',
+    u'う': u'ウ', u'ぇ': u'ェ', u'え': u'エ', u'ぉ': u'ォ', u'お': u'オ',
+    u'か': u'カ', u'が': u'ガ', u'き': u'キ', u'ぎ': u'ギ', u'く': u'ク',
+    u'ぐ': u'グ', u'け': u'ケ', u'げ': u'ゲ', u'こ': u'コ', u'ご': u'ゴ',
+    u'さ': u'サ', u'ざ': u'ザ', u'し': u'シ', u'じ': u'ジ', u'す': u'ス',
+    u'ず': u'ズ', u'せ': u'セ', u'ぜ': u'ゼ', u'そ': u'ソ', u'ぞ': u'ゾ',
+    u'た': u'タ', u'だ': u'ダ', u'ち': u'チ', u'ぢ': u'ヂ', u'っ': u'ッ',
+    u'つ': u'ツ', u'づ': u'ヅ', u'て': u'テ', u'で': u'デ', u'と': u'ト',
+    u'ど': u'ド', u'な': u'ナ', u'に': u'ニ', u'ぬ': u'ヌ', u'ね': u'ネ',
+    u'の': u'ノ', u'は': u'ハ', u'ば': u'バ', u'ぱ': u'パ', u'ひ': u'ヒ',
+    u'び': u'ビ', u'ぴ': u'ピ', u'ふ': u'フ', u'ぶ': u'ブ', u'ぷ': u'プ',
+    u'へ': u'ヘ', u'べ': u'ベ', u'ぺ': u'ペ', u'ほ': u'ホ', u'ぼ': u'ボ',
+    u'ぽ': u'ポ', u'ま': u'マ', u'み': u'ミ', u'む': u'ム', u'め': u'メ',
+    u'も': u'モ', u'ゃ': u'ャ', u'や': u'ヤ', u'ゅ': u'ュ', u'ゆ': u'ユ',
+    u'ょ': u'ョ', u'よ': u'ヨ', u'ら': u'ラ', u'り': u'リ', u'る': u'ル',
+    u'れ': u'レ', u'ろ': u'ロ', u'ゎ': u'ヮ', u'わ': u'ワ', u'ゐ': u'ヰ',
+    u'ゑ': u'ヱ', u'を': u'ヲ', u'ん': u'ン', u'ゔ': u'ヴ', u'ゕ': u'ヵ',
+    u'ゖ': u'ヶ', u'ゝ': u'ヽ', u'ゞ': u'ヾ',
+}
+
 POKEMON_TABLE = {u'X': u'エックス', u'Y': u'ワイ', u'Z': u'ゼット',
                  u'2': u'ツー',
                  u'♂': u'オス', u'♀': u'メス',
                  }
 
+
+def hiragana_judge(c):
+    if 'ぁ' <= c <= 'ゟ':
+        return True
+    return False
+
+
+def katakana_judge(c):
+    if '゠' <= c <= 'ヿ':
+        return True
+    return False
+
+
+def kana_judge(c):
+    if hiragana_judge(c) or katakana_judge(c):
+        return True
+    return False
+
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=u'JSON辞書作成スクリプト')
+    parser.add_argument('-b', '--biology', action='store_true', help=u'生物学の学名と和名の対応ファイルの読み込み時に使用')
     parser.add_argument('-n', '--naistdic', action='store_true', help=u'NAIST Japanese Dictionaryの読み込み時に使用')
     parser.add_argument('-p', '--pokemon', action='store_true', help=u'kotofurumiya/pokemon_dataの読み込み時に使用')
     parser.add_argument('inputfile', type=argparse.FileType('r'))
@@ -62,8 +103,17 @@ if __name__ == '__main__':
                     else:
                         yomi += v
                 inputData[yomi] = [name]
+        elif args.biology:
+            for line in f:
+                word = line.rstrip().split('\t')[1]
+                if kana_judge(word[0]):
+                    if hiragana_judge(word[0]):
+                        for tmp in HIRAGANA_TO_KATAKANA.keys():
+                            word = word.replace(tmp, HIRAGANA_TO_KATAKANA[tmp])
+                    inputData[word.replace(u'・', '').replace(' ', '').replace(u'亜種', u'アシュ')] = [word]
         else:
             sys.exit(u'オプションが指定されていません')
+    print('inputData  length:', len(inputData))
 
     outputData = []
     for key in sorted(inputData.keys()):
@@ -74,8 +124,10 @@ if __name__ == '__main__':
         data['key'] = key
         data['org'] = inputData[key]
         data['first'] = key[0]
-        if key[-1] == u'ー':
+        if key[-1] == u'ー' and 1 < len(key):
             data['end'] = key[-2]
+        elif key[-1] == u'ー' and len(key) == 1:
+            continue
         else:
             data['end'] = key[-1]
         if data['end'] in LOWER_CASE:
@@ -89,7 +141,13 @@ if __name__ == '__main__':
                 data['first'] = VOICED_SOUND_MARK[data['first']]
             if data['end'] in VOICED_SOUND_MARK:
                 data['end'] = VOICED_SOUND_MARK[data['end']]
-        outputData.append(data)
+        for v in key:
+            if not katakana_judge(v):
+                # print(key)
+                break
+        else:
+            outputData.append(data)
+    print('outputData length:', len(outputData))
 
     with args.outputfile as wf:
         json.dump(outputData, wf, indent=2)
