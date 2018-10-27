@@ -28,16 +28,18 @@ import random
 WORDS_COUNT_LIMIT = 10
 
 
-with open('data/dict.json') as json_file:
-    json_dic = json.load(json_file)
-    json_start_word_dic = json.loads('''
-    [{
-        "key": "シリトリ",
-        "org": ["尻取り"],
-        "first": "シ",
-        "end": "リ"
-    }]''')
-    json_dic.extend(json_start_word_dic)
+def load_dic(user):
+    with open(user.json_file_path) as json_file:
+        json_dic = json.load(json_file)
+        json_start_word_dic = json.loads('''
+        [{
+            "key": "シリトリ",
+            "org": ["尻取り"],
+            "first": "シ",
+            "end": "リ"
+        }]''')
+        json_dic.extend(json_start_word_dic)
+    return json_dic
 
 
 class User(ndb.Model):
@@ -46,6 +48,7 @@ class User(ndb.Model):
     last_word = ndb.TextProperty()
     last_word_end = ndb.TextProperty()
     count = ndb.IntegerProperty()
+    json_file_path = ndb.TextProperty()
     date = ndb.DateTimeProperty(auto_now_add=True)
 
 
@@ -60,10 +63,11 @@ def contains_user(user_id):
     return False
 
 
-def load_user(user_id, default_last_word=u'シリトリ'):
+def load_user(user_id):
     try:
         user = User.get_by_id(user_id)
         if user:
+            user.json_file_path
             return user
     except Exception as e:
         logging.exception(u'load_user: %s', e)
@@ -74,7 +78,13 @@ def load_user(user_id, default_last_word=u'シリトリ'):
     user.last_word = u''
     user.last_word_end = u''
     user.count = 0
-    word_record = search_reading_from_dic(default_last_word)
+    user.json_file_path = u'data/dict.json'
+    word_record = {
+        u'key': u'シリトリ',
+        u'org': [u'尻取り'],
+        u'first': u'シ',
+        u'end': u'リ'
+    }
     save_word_datastore(user, word_record)
     return user
 
@@ -160,10 +170,16 @@ def save_word_datastore(user, save_word_record):
     user.put()
 
 
-def search_reading_from_dic(search_word):
+def save_json_file_path(user, json_file_path):
+    user.json_file_path = json_file_path
+    user.put()
+
+
+def search_reading_from_dic(search_word, json_dic):
     """json形式の辞書ファイルを全探索し、引数の文字列を含む単語レコードを返す。
 
     :param unicode search_word: 検索する文字列
+    :param unicode json_dic: json形式の辞書ファイル
     :rtype: unicode
     :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """
@@ -176,11 +192,13 @@ def search_reading_from_dic(search_word):
     return {}
 
 
-def search_word_record_from_dic(user, search_first):
+def search_word_record_from_dic(user, search_first, json_dic):
     """json形式の辞書ファイルを全探索し、読みが search_first で始まる適当な単語レコードを返す。
     無効な単語（既出の単語・存在しない単語・「ん」で終わる単語）のレコードは返さない。
 
+    :param infra.User user: ユーザ
     :param unicode search_first: カタカナ 1 文字
+    :param unicode json_dic: json形式の辞書ファイル
     :rtype: dict
     :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """
@@ -202,11 +220,13 @@ def search_word_record_from_dic(user, search_first):
         return {}
 
 
-def search_lose_word_record_from_dic(user, search_first):
+def search_lose_word_record_from_dic(user, search_first, json_dic):
     """json形式の辞書ファイルを全探索し、読みが search_first で始まり
     かつ、「ん」で終わる単語レコードを返す。
 
+    :param infra.User user: ユーザ
     :param unicode search_first: カタカナ 1 文字
+    :param unicode json_dic: json形式の辞書ファイル
     :rtype: dict
     :return: 検索した単語レコード(辞書にない場合は空の辞書)
     """

@@ -23,6 +23,7 @@ import logging
 import infra
 
 ASK_CONTINUE_EVENT = u'ASK_CONTINUE_EVENT'
+ASK_DIC_EVENT = u'ASK_DIC_EVENT'
 ASK_WORD_EVENT = u'ASK_WORD_EVENT'
 DECLARE_USER_LOSE_EVENT = u'DECLARE_USER_LOSE_EVENT'
 DECLARE_GOOGLE_HOME_LOSE_EVENT = u'DECLARE_GOOGLE_HOME_LOSE_EVENT'
@@ -50,7 +51,7 @@ def ask_continue(obj):
     else:
         return {
             u'followupEventInput': {
-                u'name': ASK_WORD_EVENT,
+                u'name': ASK_DIC_EVENT,
                 u'languageCode': queryResult[u'languageCode'],
             }
         }
@@ -65,10 +66,51 @@ def set_continue(obj):
         userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
         user = infra.load_user(userId)
         infra.reset_datastore(user)
+        return {
+            u'followupEventInput': {
+                u'name': ASK_DIC_EVENT,
+                u'languageCode': queryResult[u'languageCode'],
+            }
+        }
     elif startMode == PARAM_START_MODE_CONTINUE:
         logging.info(PARAM_START_MODE_CONTINUE)
+        return {
+            u'followupEventInput': {
+                u'name': ASK_WORD_EVENT,
+                u'languageCode': queryResult[u'languageCode'],
+            }
+        }
     else:
         raise RuntimeError(u"Unknown startMode: " + startMode)
+
+
+def set_dic(obj):
+    queryResult = obj[u'queryResult']
+
+    try:
+        # float 型から int 型へ変換する
+        dicNum = int(queryResult[u'parameters'][u'dicNum'])
+    except ValueError:
+        dicNum = 0
+
+    logging.info(u'set_dic dicNum: ' + unicode(dicNum))
+
+    originalDetectIntentRequest = obj['originalDetectIntentRequest']
+    userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
+    user = infra.load_user(userId)
+
+    if dicNum == 1:
+        # 1番、普通の辞書
+        infra.save_json_file_path(user, u'data/dict.json')
+    elif dicNum == 2:
+        # 2番、ポケモン辞書
+        infra.save_json_file_path(user, u'data/pokemon.json')
+    else:
+        return {
+            u'fulfillmentText': u'辞書を番号で選んでください。1番、普通の辞書。2番、ポケモン辞書。',
+        }
+
+    logging.info(u'set_dic user.json_file_path: ' + user.json_file_path)
 
     return {
         u'followupEventInput': {
@@ -95,7 +137,8 @@ def response_word_inner(obj, user):
         }
     else:
         logging.info(queryText)
-        req_word_record = infra.search_reading_from_dic(queryText)
+        json_dic = infra.load_dic(user)
+        req_word_record = infra.search_reading_from_dic(queryText, json_dic)
         if req_word_record:
             req_word_reading = req_word_record[u'key']
             logging.info(req_word_reading)
@@ -119,7 +162,7 @@ def response_word_inner(obj, user):
                         }
                     else:
                         resp_word_record = infra.search_word_record_from_dic(
-                            user, req_word_reading_end)
+                            user, req_word_reading_end, json_dic)
                         logging.info(resp_word_record)
                         word = resp_word_record[u'org'][0]
                         infra.save_word_datastore(user, resp_word_record)
@@ -148,10 +191,11 @@ def response_lose_word(obj):
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
 
     user = infra.load_user(userId)
+    json_dic = infra.load_dic(user)
     reading_end = user.last_word_end
 
     word_record = infra.search_lose_word_record_from_dic(
-        user, reading_end)
+        user, reading_end, json_dic)
     logging.info(word_record)
     fulfillmentText = u''
     if word_record:
