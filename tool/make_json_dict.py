@@ -8,9 +8,9 @@ ipadicをjsonの辞書ファイルに変換するスクリプト
 """
 
 import argparse
+import csv
 import json
 import sys
-import csv
 
 LOWER_CASE = {u'ァ': u'ア', u'ィ': u'イ', u'ゥ': u'ウ', u'ェ': u'エ', u'ォ': u'オ',
               u'ャ': u'ヤ', u'ュ': u'ユ', u'ョ': u'ヨ', u'ヮ': u'ワ',
