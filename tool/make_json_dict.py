@@ -8,6 +8,7 @@
 """
 
 import argparse
+import csv
 import json
 import sys
 
@@ -76,6 +77,7 @@ if __name__ == '__main__':
     parser.add_argument('-b', '--biology', action='store_true', help=u'生物学の学名と和名の対応ファイルの読み込み時に使用')
     parser.add_argument('-n', '--naistdic', action='store_true', help=u'NAIST Japanese Dictionaryの読み込み時に使用')
     parser.add_argument('-p', '--pokemon', action='store_true', help=u'kotofurumiya/pokemon_dataの読み込み時に使用')
+    parser.add_argument('-s', '--station', action='store_true', help=u'geonlp_japan_stationの読み込み時に使用')
     parser.add_argument('inputfile', type=argparse.FileType('r'))
     parser.add_argument('outputfile', type=argparse.FileType('w'))
     args = parser.parse_args()
@@ -103,6 +105,16 @@ if __name__ == '__main__':
                     else:
                         yomi += v
                 inputData[yomi] = [name]
+        elif args.station:
+            obj = csv.reader(f)
+            for line in obj:
+                org = line[2]
+                key = line[3]
+                if key in inputData:
+                    if org not in inputData[key]:
+                        inputData[key].append(org)
+                else:
+                    inputData[key] = [org]
         elif args.biology:
             for line in f:
                 word = line.rstrip().split('\t')[1]
