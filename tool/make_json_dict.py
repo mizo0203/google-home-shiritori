@@ -159,7 +159,7 @@ if __name__ == '__main__':
         for v in key:
             if not katakana_judge(v):
                 if args.debug:
-                    print(u'Excluded key "' + key + u'"')
+                    print(u'Excluded key: ' + key)
                 break
         else:
             outputData.append(data)
