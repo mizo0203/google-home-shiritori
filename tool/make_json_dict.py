@@ -110,7 +110,7 @@ if __name__ == '__main__':
         elif args.station:
             obj = csv.reader(f)
             for line in obj:
-                orgs = line[0] .replace('(', ' ').split(' ')
+                orgs = line[0].split('(')
                 org = orgs[0]
                 if u'・' in org:
                     key = line[1] + line[2]
