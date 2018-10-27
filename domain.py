@@ -93,7 +93,7 @@ def set_dic(obj):
     except ValueError:
         dicNum = 0
 
-    logging.info(u'set_dic dicNum: ' + unicode(dicNum))
+    logging.info(u'set_dic dicNum: ' + str(dicNum))
 
     originalDetectIntentRequest = obj['originalDetectIntentRequest']
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
