@@ -173,7 +173,7 @@ if __name__ == '__main__':
             data['first'] = CONVERSION_TABLE[data['first']]
         if data['end'] in CONVERSION_TABLE:
             data['end'] = CONVERSION_TABLE[data['end']]
-        if args.pokemon:
+        if args.animedb or args.biology or args.pokemon or args.station:
             if data['first'] in VOICED_SOUND_MARK:
                 data['first'] = VOICED_SOUND_MARK[data['first']]
             if data['end'] in VOICED_SOUND_MARK:
