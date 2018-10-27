@@ -138,18 +138,18 @@ if __name__ == '__main__':
                     inputData[word.replace(u'・', '').replace(' ', '').replace(u'亜種', u'アシュ')] = [word]
         else:
             sys.exit(u'オプションが指定されていません')
-    print('inputData  length:', len(inputData))
+    print(u'inputData  length:', len(inputData))
 
     outputData = []
     for key in sorted(inputData.keys()):
         data = {}
         if key == '':
-            sys.stderr.write('key is null\n')
+            sys.stderr.write(u'key is null\n')
             continue
         data['key'] = key
         data['org'] = inputData[key]
         data['first'] = key[0]
-        if key[-1] == u'ー':
+        if key.endswith(u'ー'):
             if 1 < len(key):
                 data['end'] = key[-2]
             else:
@@ -174,7 +174,7 @@ if __name__ == '__main__':
                 break
         else:
             outputData.append(data)
-    print('outputData length:', len(outputData))
+    print(u'outputData length:', len(outputData))
 
     with args.outputfile as wf:
         json.dump(outputData, wf, indent=2)
