@@ -75,7 +75,7 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj[u'followupEventInput'][u'name'] == u'ASK_WORD_EVENT'
+        assert obj[u'followupEventInput'][u'name'] == u'ASK_DIC_EVENT'
         assert obj[u'followupEventInput'][u'languageCode'] == u'ja'
 
     def test_post_ask_continue_intent(self):
@@ -110,7 +110,7 @@ class TestWebApp(unittest.TestCase):
         obj = json.loads(response.body)
 
         assert response.status_int == 200
-        assert obj[u'followupEventInput'][u'name'] == u'ASK_WORD_EVENT'
+        assert obj[u'followupEventInput'][u'name'] == u'ASK_DIC_EVENT'
         assert obj[u'followupEventInput'][u'languageCode'] == u'ja'
 
     def test_post_ask_word_intent_1(self):

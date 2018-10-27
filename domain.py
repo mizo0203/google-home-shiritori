@@ -137,7 +137,7 @@ def response_word_inner(obj, user):
         }
     else:
         logging.info(queryText)
-        json_dic = infra.load_dic(user)
+        json_dic = infra.load_dic(user.json_file_path)
         req_word_record = infra.search_reading_from_dic(queryText, json_dic)
         if req_word_record:
             req_word_reading = req_word_record[u'key']
@@ -191,7 +191,7 @@ def response_lose_word(obj):
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
 
     user = infra.load_user(userId)
-    json_dic = infra.load_dic(user)
+    json_dic = infra.load_dic(user.json_file_path)
     reading_end = user.last_word_end
 
     word_record = infra.search_lose_word_record_from_dic(

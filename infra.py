@@ -28,8 +28,8 @@ import random
 WORDS_COUNT_LIMIT = 10
 
 
-def load_dic(user):
-    with open(user.json_file_path) as json_file:
+def load_dic(json_file_path):
+    with open(json_file_path) as json_file:
         json_dic = json.load(json_file)
         json_start_word_dic = json.loads('''
         [{
