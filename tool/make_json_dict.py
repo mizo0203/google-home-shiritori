@@ -111,8 +111,18 @@ if __name__ == '__main__':
         elif args.station:
             obj = csv.reader(f)
             for line in obj:
-                org = line[2]
-                key = line[3]
+                orgs = line[0].split('(')
+                org = orgs[0]
+                if u'・' in org:
+                    key = line[1] + line[2]
+                else:
+                    key = line[1]
+                if key.endswith(u'えき'):
+                    key = key[:-2]
+                key = key.replace('[', '').replace(']', '')
+                if hiragana_judge(key[0]):
+                    for tmp in HIRAGANA_TO_KATAKANA.keys():
+                        key = key.replace(tmp, HIRAGANA_TO_KATAKANA[tmp])
                 if key in inputData:
                     if org not in inputData[key]:
                         inputData[key].append(org)
