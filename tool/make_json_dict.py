@@ -124,10 +124,11 @@ if __name__ == '__main__':
         data['key'] = key
         data['org'] = inputData[key]
         data['first'] = key[0]
-        if key[-1] == u'ー' and 1 < len(key):
-            data['end'] = key[-2]
-        elif key[-1] == u'ー' and len(key) == 1:
-            continue
+        if key[-1] == u'ー':
+            if 1 < len(key):
+                data['end'] = key[-2]
+            else:
+                continue
         else:
             data['end'] = key[-1]
         if data['end'] in LOWER_CASE:
