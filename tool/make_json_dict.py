@@ -76,6 +76,7 @@ def kana_judge(c):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=u'JSON辞書作成スクリプト')
     parser.add_argument('-d', '--debug', action='store_true', help=u'デバッグ出力用オプション')
+    parser.add_argument('-a', '--animedb', action='store_true', help=u'anilogia/animedbの読み込み時に使用')
     parser.add_argument('-b', '--biology', action='store_true', help=u'生物学の学名と和名の対応ファイルの読み込み時に使用')
     parser.add_argument('-n', '--naistdic', action='store_true', help=u'NAIST Japanese Dictionaryの読み込み時に使用')
     parser.add_argument('-p', '--pokemon', action='store_true', help=u'kotofurumiya/pokemon_dataの読み込み時に使用')
@@ -136,20 +137,30 @@ if __name__ == '__main__':
                         for tmp in HIRAGANA_TO_KATAKANA.keys():
                             word = word.replace(tmp, HIRAGANA_TO_KATAKANA[tmp])
                     inputData[word.replace(u'・', '').replace(' ', '').replace(u'亜種', u'アシュ')] = [word]
+        elif args.animedb:
+            obj = csv.reader(f)
+            for line in obj:
+                org = line[4]
+                key = line[6].replace(' ', '')
+                if key in inputData:
+                    if org not in inputData[key]:
+                        inputData[key].append(org)
+                else:
+                    inputData[key] = [org]
         else:
             sys.exit(u'オプションが指定されていません')
-    print('inputData  length:', len(inputData))
+    print(u'inputData  length:', len(inputData))
 
     outputData = []
     for key in sorted(inputData.keys()):
         data = {}
         if key == '':
-            sys.stderr.write('key is null\n')
+            sys.stderr.write(u'key is null\n')
             continue
         data['key'] = key
         data['org'] = inputData[key]
         data['first'] = key[0]
-        if key[-1] == u'ー':
+        if key.endswith(u'ー'):
             if 1 < len(key):
                 data['end'] = key[-2]
             else:
@@ -174,7 +185,7 @@ if __name__ == '__main__':
                 break
         else:
             outputData.append(data)
-    print('outputData length:', len(outputData))
+    print(u'outputData length:', len(outputData))
 
     with args.outputfile as wf:
         json.dump(outputData, wf, indent=2)
