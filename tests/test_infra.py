@@ -25,9 +25,14 @@ import infra
 
 class TestInfra(unittest.TestCase):
     def test_search_reading_from_dic(self):
-        assert infra.search_reading_from_dic(u'リンゴ')[u'key'] == u'リンゴ'
-        assert infra.search_reading_from_dic(u'りんご')[u'key'] == u'リンゴ'
-        assert infra.search_reading_from_dic(u'林檎')[u'key'] == u'リンゴ'
+        json_dic = infra.load_dic(u'data/dict.json')
+        reading = infra.search_reading_from_dic(u'リンゴ', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+        reading = infra.search_reading_from_dic(u'りんご', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+        reading = infra.search_reading_from_dic(u'林檎', json_dic)
+        assert reading[u'key'] == u'リンゴ'
 
     def test_search_reading_from_dic_none_words(self):
-        assert infra.search_reading_from_dic(u'溝口') == {}
+        json_dic = infra.load_dic(u'data/dict.json')
+        assert infra.search_reading_from_dic(u'溝口', json_dic) == {}
