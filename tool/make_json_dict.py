@@ -51,6 +51,7 @@ HIRAGANA_TO_KATAKANA = {
 POKEMON_TABLE = {u'X': u'エックス', u'Y': u'ワイ', u'Z': u'ゼット',
                  u'2': u'ツー',
                  u'♂': u'オス', u'♀': u'メス',
+                 u'：': u'',
                  }
 
 
