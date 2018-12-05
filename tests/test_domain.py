@@ -36,30 +36,18 @@ class TestDomain(unittest.TestCase):
     def tearDown(self):
         self.testbed.deactivate()
 
-    def test_response_word_inner(self):
+    def test_response_searched_word_1(self):
         user = infra.load_user(u'TestId')
 
-        obj = domain.response_word_inner({
-            u'queryResult':
-                {
-                    u'intent': {
-                        u'displayName': u'Ask Word Intent',
-                    },
-                    u'queryText': u'りんご',
-                    u'languageCode': u'ja',
-                },
-            u'originalDetectIntentRequest':
-                {
-                    u'payload':
-                    {
-                        u'user':
-                        {
-                            u'userId': u'TestId'
-                        }
-                    }
-                }
-        }, user)
+        obj = domain.response_searched_word(u'りんご', u'リンゴ', u'ja', user)
 
         assert obj[u'fulfillmentText'][-4] == u'、'
         assert obj[u'fulfillmentText'][-3] == u'の'
         assert obj[u'fulfillmentText'][-2] == u'、'
+
+    def test_response_searched_word_2(self):
+        user = infra.load_user(u'TestId')
+
+        obj = domain.response_searched_word(u'ほげほげ', u'ホゲホゲ', u'ja', user)
+
+        assert obj[u'fulfillmentText'] == u'それは知らない言葉です'

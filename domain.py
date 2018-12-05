@@ -124,10 +124,6 @@ def response_word(obj):
     originalDetectIntentRequest = obj['originalDetectIntentRequest']
     userId = originalDetectIntentRequest[u'payload'][u'user'][u'userId']
     user = infra.load_user(userId)
-    return response_word_inner(obj, user)
-
-
-def response_word_inner(obj, user):
     queryResult = obj[u'queryResult']
     queryText = queryResult[u'queryText']
 
@@ -136,54 +132,64 @@ def response_word_inner(obj, user):
             u'fulfillmentText': user.last_word + u'、の、' + user.last_word_end,
         }
     else:
-        logging.info(queryText)
-        json_dic = infra.load_dic(user.json_file_path)
-        req_word_record = infra.search_reading_from_dic(queryText, json_dic)
-        if req_word_record:
-            req_word_reading = req_word_record[u'key']
-            logging.info(req_word_reading)
-            req_word_reading_end = req_word_record[u'end']
-            if infra.check_last_word_datastore(user, req_word_record):
-                if infra.check_word_datastore(user, req_word_reading):
-                    infra.save_word_datastore(user, req_word_record)
-                    if req_word_reading_end == u'ン':
-                        return {
-                            u'followupEventInput': {
-                                u'name': DECLARE_USER_LOSE_EVENT,
-                                u'languageCode': queryResult[u'languageCode'],
-                            }
-                        }
-                    elif infra.is_need_google_home_lose(user):
-                        return {
-                            u'followupEventInput': {
-                                u'name': DECLARE_GOOGLE_HOME_LOSE_EVENT,
-                                u'languageCode': queryResult[u'languageCode'],
-                            }
-                        }
-                    else:
-                        resp_word_record = infra.search_word_record_from_dic(
-                            user, req_word_reading_end, json_dic)
-                        logging.info(resp_word_record)
-                        word = resp_word_record[u'org'][0]
-                        infra.save_word_datastore(user, resp_word_record)
-                        fulfillmentText = word + u'、の、' + \
-                            resp_word_record[u'end']
-                        logging.info(fulfillmentText)
-                        return {
-                            u'fulfillmentText': fulfillmentText,
-                        }
-                else:
+        yahoo_appid = infra.load_yahoo_appid()
+        queryText = queryResult[u'queryText']
+        queryKanaText = infra.furigana(yahoo_appid, queryText)
+        languageCode = queryResult[u'languageCode']
+        return response_searched_word(queryText, queryKanaText, languageCode, user)
+
+
+def response_searched_word(queryText, queryKanaText, languageCode, user):
+    logging.info(queryText)
+
+    json_dic = infra.load_dic(user.json_file_path)
+    req_word_record = infra.search_reading_from_dic(
+        queryText, queryKanaText, json_dic)
+    if req_word_record:
+        req_word_reading = req_word_record[u'key']
+        logging.info(req_word_reading)
+        req_word_reading_end = req_word_record[u'end']
+        if infra.check_last_word_datastore(user, req_word_record):
+            if infra.check_word_datastore(user, req_word_reading):
+                infra.save_word_datastore(user, req_word_record)
+                if req_word_reading_end == u'ン':
                     return {
-                        u'fulfillmentText': u'それは使用済みの言葉です',
+                        u'followupEventInput': {
+                            u'name': DECLARE_USER_LOSE_EVENT,
+                            u'languageCode': languageCode,
+                        }
+                    }
+                elif infra.is_need_google_home_lose(user):
+                    return {
+                        u'followupEventInput': {
+                            u'name': DECLARE_GOOGLE_HOME_LOSE_EVENT,
+                            u'languageCode': languageCode,
+                        }
+                    }
+                else:
+                    resp_word_record = infra.search_word_record_from_dic(
+                        user, req_word_reading_end, json_dic)
+                    logging.info(resp_word_record)
+                    word = resp_word_record[u'org'][0]
+                    infra.save_word_datastore(user, resp_word_record)
+                    fulfillmentText = word + u'、の、' + \
+                        resp_word_record[u'end']
+                    logging.info(fulfillmentText)
+                    return {
+                        u'fulfillmentText': fulfillmentText,
                     }
             else:
                 return {
-                    u'fulfillmentText': infra.get_last_word_datastore(user) + u'で始まる言葉を使ってください',
+                    u'fulfillmentText': u'それは使用済みの言葉です',
                 }
         else:
             return {
-                u'fulfillmentText': u'それは知らない言葉です',
+                u'fulfillmentText': infra.get_last_word_datastore(user) + u'で始まる言葉を使ってください',
             }
+    else:
+        return {
+            u'fulfillmentText': u'それは知らない言葉です',
+        }
 
 
 def response_lose_word(obj):
