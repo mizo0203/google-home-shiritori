@@ -24,7 +24,12 @@ from xml.dom import minidom
 import json
 import logging
 import random
-import urllib
+import requests
+import requests_toolbelt.adapters.appengine
+
+# Use the App Engine Requests adapter. This makes sure that Requests uses
+# URLFetch.
+requests_toolbelt.adapters.appengine.monkeypatch()
 
 # しりとりが WORDS_COUNT_LIMIT 以上続いたら AI が降参する
 WORDS_COUNT_LIMIT = 100
@@ -316,8 +321,9 @@ class YahooFuriganaAPI:
             'sentence': sentence,
         }
         params.update(options)
-        params = urllib.urlencode(params)
-        return urllib.urlopen(url, params).read()
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        return response.text
 
     def furigana(self, sentence, options={}):
         xml = self._access(
@@ -336,17 +342,17 @@ def furigana(yahoo_appid, sentence):
     """
     try:
         api = YahooFuriganaAPI(yahoo_appid)
-        xml = api.furigana(sentence.encode('utf-8'))
-        dom = minidom.parseString(xml)
+        xml = api.furigana(sentence)
+        dom = minidom.parseString(xml.encode('utf-8'))
         nodes = dom.getElementsByTagName('Furigana')
 
         hiragana = u''
         for node in nodes:
             hiragana += node.firstChild.data
-        logging.info(hiragana)
+        logging.info(u'furigana:' + hiragana)
 
         katakana = replace_hiragana_to_katakana(hiragana)
-        logging.info(katakana)
+        logging.info(u'furigana:' + katakana)
         return katakana
     except Exception as e:
         logging.exception(u'furigana: %s', e)
