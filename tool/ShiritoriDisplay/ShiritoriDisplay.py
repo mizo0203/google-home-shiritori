@@ -36,6 +36,9 @@ PARAMETER = '?id='
 ID = ''
 REQUEST_URL = URL + PARAMETER + ID
 
+# FIXME: 辞書に応じてオッズを自動取得 or ディスプレイアプリにテキストボックスを追加して起動時に入力
+ODDS = 1.2
+
 REQUEST_INTERVAL = 10.0
 
 
@@ -55,15 +58,17 @@ class ShiritoriDisplayWidget(Widget):
     is_connect = BooleanProperty()
     word = StringProperty()
     word_end = StringProperty()
-    count = StringProperty()
+    num = StringProperty()
+    score = StringProperty()
     word_list = StringProperty()
 
     def __init__(self, **kwargs):
         super(ShiritoriDisplayWidget, self).__init__(**kwargs)
         self.is_connect = False
         self.word = u'開始待ち'
-        self.word_end = u'ち'
-        self.count = u'0回目'
+        self.word_end = u''
+        self.num = u'0 回'
+        self.score = u'オッズ ' + str(ODDS)
         self.word_list = u''
 
     def get_JSON(self):
@@ -73,7 +78,10 @@ class ShiritoriDisplayWidget(Widget):
             if obj and self.word != obj['last_word']:
                 self.word = obj['last_word']
                 self.word_end = obj['last_word_end']
-                self.count = str(obj['count']) + u'回目'
+                # 最初の単語 'しりとり' の 1 回分を除外
+                num = obj['count'] - 1
+                self.num = str(num) + u' 回'
+                self.score = '{:.1f}'.format(num * ODDS) + u' 点'
                 self.word_list = convertWords2Text(obj)
 
     def on_command(self, command):
