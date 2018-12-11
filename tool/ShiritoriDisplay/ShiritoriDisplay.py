@@ -47,11 +47,21 @@ def convertWords2Text(obj):
     word_list = obj['words'].split(',')
     out_text = ''
     for i in range(len(word_list)):
+        org_word = omitBy3PointLeader(org_word_list[i], 6)
+        word = omitBy3PointLeader(word_list[i], 5)
         if i % 2 == 0:
-            out_text = u'AI  :' + org_word_list[i] + u'（' + word_list[i] + u'）\n' + out_text
+            out_text = u'AI  :' + org_word + u'（' + word + u'）\n' + out_text
         else:
-            out_text = u'User:' + org_word_list[i] + u'（' + word_list[i] + u'）\n' + out_text
+            out_text = u'User:' + org_word + u'（' + word + u'）\n' + out_text
     return out_text
+
+
+def omitBy3PointLeader(text, text_len):
+    """三点リーダ「…」を使って text を省略する
+    """
+    if len(text) > text_len:
+        text = text[:(text_len - 2)] + u'…' + text[-1]
+    return text
 
 
 class ShiritoriDisplayWidget(Widget):
@@ -76,7 +86,7 @@ class ShiritoriDisplayWidget(Widget):
         if r.status_code == 200:
             obj = r.json()
             if obj and self.word != obj['last_word']:
-                self.word = obj['last_word']
+                self.word = omitBy3PointLeader(obj['last_word'], 6)
                 self.word_end = obj['last_word_end']
                 # 最初の単語 'しりとり' の 1 回分を除外
                 num = obj['count'] - 1
