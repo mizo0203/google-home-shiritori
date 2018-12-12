@@ -26,13 +26,35 @@ import infra
 class TestInfra(unittest.TestCase):
     def test_search_reading_from_dic(self):
         json_dic = infra.load_dic(u'data/dict.json')
-        reading = infra.search_reading_from_dic(u'リンゴ', json_dic)
+
+        # 正常系
+        reading = infra.search_reading_from_dic(u'リンゴ', u'リンゴ', json_dic)
         assert reading[u'key'] == u'リンゴ'
-        reading = infra.search_reading_from_dic(u'りんご', json_dic)
+        reading = infra.search_reading_from_dic(u'りんご', u'リンゴ', json_dic)
         assert reading[u'key'] == u'リンゴ'
-        reading = infra.search_reading_from_dic(u'林檎', json_dic)
+        reading = infra.search_reading_from_dic(u'林檎', u'リンゴ', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+
+        # 準正常系 - フリガナ取得失敗
+        reading = infra.search_reading_from_dic(u'リンゴ', u'', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+        reading = infra.search_reading_from_dic(u'りんご', u'', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+        reading = infra.search_reading_from_dic(u'林檎', u'', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+
+        # 準正常系 - フリガナのみ正常
+        reading = infra.search_reading_from_dic(u'', u'リンゴ', json_dic)
+        assert reading[u'key'] == u'リンゴ'
+        reading = infra.search_reading_from_dic(u'林☆檎', u'リンゴ', json_dic)
         assert reading[u'key'] == u'リンゴ'
 
     def test_search_reading_from_dic_none_words(self):
         json_dic = infra.load_dic(u'data/dict.json')
-        assert infra.search_reading_from_dic(u'溝口', json_dic) == {}
+        assert infra.search_reading_from_dic(u'溝口', u'ミゾグチ', json_dic) == {}
+        assert infra.search_reading_from_dic(u'溝口', u'', json_dic) == {}
+        assert infra.search_reading_from_dic(u'', u'ミゾグチ', json_dic) == {}
+
+    def test_replace_hiragana_to_katakana(self):
+        assert infra.replace_hiragana_to_katakana(u'ふりがな') == u'フリガナ'
+        assert infra.replace_hiragana_to_katakana(u'りんご') == u'リンゴ'
