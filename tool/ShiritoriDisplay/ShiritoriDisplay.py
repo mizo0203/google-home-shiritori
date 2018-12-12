@@ -41,18 +41,37 @@ ODDS = 1.2
 
 REQUEST_INTERVAL = 10.0
 
+# 画面下部にて、 1 行で表示できる単語の文字数
+LINE_WIDTH = 13
+
 
 def convertWords2Text(obj):
     org_word_list = obj['org_words'].split(',')
     word_list = obj['words'].split(',')
     out_text = ''
     for i in range(len(word_list)):
-        org_word = omitBy3PointLeader(org_word_list[i], 6)
-        word = omitBy3PointLeader(word_list[i], 5)
-        if i % 2 == 0:
-            out_text = u'AI  :' + org_word + u'（' + word + u'）\n' + out_text
+        org_word = org_word_list[i]
+        word = u'（' + word_list[i] + u'）'
+        if len(org_word + word) <= LINE_WIDTH:
+            # 単語と読み仮名を合わせて 1 行 (13 文字以下) で表示できる場合
+            # 合わせて 1 行で表示する
+            lines = [org_word + word]
         else:
-            out_text = u'User:' + org_word + u'（' + word + u'）\n' + out_text
+            # 単語と読み仮名を合わせて 1 行で表示できない場合
+            # 単語と読み仮名を別の行で表示する
+            # さらに、それぞれを 13 文字毎に改行する
+            lines = [org_word[j:(j + LINE_WIDTH)]
+                     for j in range(0, len(org_word), LINE_WIDTH)]
+            lines += [word[j:(j + LINE_WIDTH)]
+                      for j in range(0, len(word), LINE_WIDTH)]
+        if i % 2 == 0:
+            tmp = u'AI  :' + lines[0] + u'\n'
+        else:
+            tmp = u'User:' + lines[0] + u'\n'
+        for j in range(1, len(lines), 1):
+            tmp += u'     ' + lines[j] + u'\n'
+        out_text = tmp + out_text
+
     return out_text
 
 
