@@ -15,6 +15,8 @@ jobs:
       TZ: /usr/share/zoneinfo/Asia/Tokyo
     steps:
       - checkout
+      # FIXME: appengine_config.py の内容 and CI 上の Python 環境を修正
+      - run: mv appengine_config.py appengine_config.py.tmp
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
       - restore_cache:
@@ -85,6 +87,8 @@ jobs:
       - store_artifacts:
           path: unittest-test-reports
           destination: unittest-test-reports
+      # FIXME: appengine_config.py の内容 and CI 上の Python 環境を修正
+      - run: mv appengine_config.py.tmp appengine_config.py
 
   deploy:
     working_directory: ~/repo
