@@ -1,3 +1,4 @@
+#:kivy 1.10.1
 # -*- coding: UTF-8 -*-
 
 # Copyright 2018 Hayato Kubo
@@ -22,24 +23,36 @@ ShiritoriDisplayWidget:
         size: root.size
         BoxLayout:
             orientation: 'horizontal'
-            size_hint_y: 0.1
-            Button:
-                text: '通信停止' if root.is_connect else '通信開始'
-                font_size: 20
-                on_press: root.on_command('start/stop')
-            Button:
-                text: '画面更新'
-                font_size: 20
-                on_press: root.on_command('refresh')
+            size_hint_y: 0.3
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_x: 0.15
+                Button:
+                    text: '通信停止' if root.is_connect else '通信開始'
+                    font_size: 20
+                    on_press: root.on_command('start/stop')
+                Button:
+                    text: '画面更新'
+                    font_size: 20
+                    on_press: root.on_command('refresh')
             Label:
-                text: root.count
+                text: root.num
+                size_hint_x: 0.35
                 text_size: self.size
                 halign: 'right'
                 valign: 'center'
-                font_size: 20
+                font_size: 70
+            Label:
+                text: root.score
+                size_hint_x: 0.5
+                text_size: self.size
+                halign: 'right'
+                valign: 'center'
+                font_size: 70
+                color: (1, 1, 0, 1)
         BoxLayout:
             orientation: 'horizontal'
-            size_hint_y: 0.5
+            size_hint_y: 0.4
             Label:
                 text: root.word
                 size_hint_x: 0.8
@@ -48,6 +61,7 @@ ShiritoriDisplayWidget:
                 text: root.word_end
                 size_hint_x: 0.2
                 font_size: 100
+                color: (1, 1, 0, 1)
         Label:
             text: root.word_list
             size_hint_y: 1
