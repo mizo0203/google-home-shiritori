@@ -28,7 +28,7 @@ Copyright (c) 2008, [Nara Institute of Science and Technology](http://www.naist.
 下記の GitHub で公開されている CSV ファイルを改変して利用しています。
 
 [Anime DB](https://anilogia.github.io/animedb/) / [MIT License](https://github.com/anilogia/animedb/blob/master/LICENSE)  
-Copyright (c) 2016-present [Anilogia](https://github.com/anilogia/)
+Copyright (c) 2016-present [Anilogia](https://github.com/anilogia/)
 
 ### 駅名辞書
 
