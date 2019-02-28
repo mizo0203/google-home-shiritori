@@ -46,3 +46,8 @@ Copyright (c) 2016-present [Anilogia](https://github.com/anilogia/)
 
 ## Font
 [IPAフォント](https://ipafont.ipa.go.jp/old/ipafont/download.html)
+
+---
+
+© 2019 [Hayato Kubo](https://github.com/hayatedayon) / [Takanori Kondo](https://github.com/tKondoYDC) / [Satoki Mizoguchi](https://github.com/mizo0203),  
+Licensed under the [Apache License, Version 2.0](LICENSE).
