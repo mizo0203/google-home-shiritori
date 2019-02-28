@@ -1,5 +1,20 @@
-﻿# google-home-shiritori
-Google Home でしりとり
+﻿# Google Home™ しりとりアプリ
+
+## Overview
+
+[Google Home](http://home.google.com/)™ や [Google アシスタント](https://assistant.google.com/)™ で使用できる **音声会話アプリ** です。  
+AI を相手に音声操作で **しりとり** ができます。  
+[Apache License 2.0](LICENSE) でソースコードを公開しています。
+
+本アプリケーションは [Google App Engine](https://cloud.google.com/appengine/)™ (GAE) のスタンダード環境で動作します。  
+ユーザと Google Home 間の会話内容を [Dialogflow](https://dialogflow.com)™ が **自然言語処理** を行い、  
+GAE 上の本アプリケーションへ、ユーザ入力された単語を通知します。  
+
+**Google Home <--> Google アシスタント <--> Dialogflow <--> しりとりアプリ on GAE**
+
+ユーザ入力された単語を受信した本アプリケーションは、  
+しりとりがつながるように **辞書データ**(後述) の中から適切な単語を返却します。  
+Dialogflow としりとりアプリ間は JSON 文字列で HTTP 通信をします。
 
 ## Files
 data : data file
@@ -48,6 +63,9 @@ Copyright (c) 2016-present [Anilogia](https://github.com/anilogia/)
 [IPAフォント](https://ipafont.ipa.go.jp/old/ipafont/download.html)
 
 ---
+
+* Google Home および Google アシスタントは Google LLC の商標です。
+* その他、記載されている会社名、製品名、サービス名は、各社の登録商標または商標です。
 
 © 2019 [Hayato Kubo](https://github.com/hayatedayon) / [Takanori Kondo](https://github.com/tKondoYDC) / [Satoki Mizoguchi](https://github.com/mizo0203),  
 Licensed under the [Apache License, Version 2.0](LICENSE).
