@@ -15,10 +15,12 @@ jobs:
       TZ: /usr/share/zoneinfo/Asia/Tokyo
     steps:
       - checkout
-      # FIXME: appengine_config.py の内容 and CI 上の Python 環境を修正
-      - run: mv appengine_config.py appengine_config.py.tmp
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python2.7/site-packages
+      - run:
+          name: Create a directory to store your third-party libraries
+          command: |
+            mkdir lib
+            echo 'export PYTHONPATH=$PYTHONPATH:$(pwd)/lib/' >> $BASH_ENV
       - restore_cache:
           keys:
             - v1-dependencies-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}-
@@ -62,12 +64,12 @@ jobs:
             echo 'export PYTHONPATH=$PYTHONPATH:/usr/lib/google-cloud-sdk/platform/google_appengine/' >> $BASH_ENV
       - run:
           name: vendor our dependencies
-          command: pip install -r requirements.txt
+          command: pip install -t lib -r requirements.txt
       - save_cache:
           key: v1-dependencies-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}-{{ epoch }}
           paths:
             - "/usr/local/bin"
-            - "/usr/local/lib/python2.7/site-packages"
+            - "lib"
             - "/home/circleci/apt/archives/"
       - run:
           name: Check PEP 8 for flake8
@@ -87,8 +89,6 @@ jobs:
       - store_artifacts:
           path: unittest-test-reports
           destination: unittest-test-reports
-      # FIXME: appengine_config.py の内容 and CI 上の Python 環境を修正
-      - run: mv appengine_config.py.tmp appengine_config.py
 
   deploy:
     working_directory: ~/repo
