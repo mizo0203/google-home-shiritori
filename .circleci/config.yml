@@ -102,9 +102,17 @@ jobs:
       TZ: /usr/share/zoneinfo/Asia/Tokyo
     steps:
       - checkout
+      - run:
+          name: Create a directory to store your third-party libraries
+          command: |
+            mkdir lib
       - restore_cache:
           keys:
-            - v1-dependencies-{{ checksum "requirements.txt" }}-{{ checksum ".circleci/config.yml" }}-
+            - v1-dependencies-{{ checksum "requirements.txt" }}-{{ checksum "requirements-ci.txt" }}-{{ checksum ".circleci/config.yml" }}-
+      - run:
+          name: vendor our dependencies
+          command: |
+            pip install -t lib -r requirements.txt
       - run:
           name: Retrieve our secrets from the CircleCI environment
           command: echo $CLIENT_SECRET | base64 --decode > ${HOME}/client-secret.json
