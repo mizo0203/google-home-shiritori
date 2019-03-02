@@ -1,7 +1,2 @@
-flake8
-pylint
-pyyaml
-webtest
-webapp2
 requests
 requests-toolbelt
