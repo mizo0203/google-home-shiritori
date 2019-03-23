@@ -54,7 +54,3 @@ class TestInfra(unittest.TestCase):
         assert infra.search_reading_from_dic(u'溝口', u'ミゾグチ', json_dic) == {}
         assert infra.search_reading_from_dic(u'溝口', u'', json_dic) == {}
         assert infra.search_reading_from_dic(u'', u'ミゾグチ', json_dic) == {}
-
-    def test_replace_hiragana_to_katakana(self):
-        assert infra.replace_hiragana_to_katakana(u'ふりがな') == u'フリガナ'
-        assert infra.replace_hiragana_to_katakana(u'りんご') == u'リンゴ'
