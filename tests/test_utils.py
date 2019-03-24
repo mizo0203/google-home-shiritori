@@ -20,10 +20,10 @@ from __future__ import print_function
 
 import unittest
 
-import yahooapis
+import utils
 
 
 class TestInfra(unittest.TestCase):
     def test_replace_hiragana_to_katakana(self):
-        assert yahooapis.replace_hiragana_to_katakana(u'ふりがな') == u'フリガナ'
-        assert yahooapis.replace_hiragana_to_katakana(u'りんご') == u'リンゴ'
+        assert utils.replace_hiragana_to_katakana(u'ふりがな') == u'フリガナ'
+        assert utils.replace_hiragana_to_katakana(u'りんご') == u'リンゴ'
