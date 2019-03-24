@@ -25,5 +25,14 @@ import utils
 
 class TestInfra(unittest.TestCase):
     def test_replace_hiragana_to_katakana(self):
+        # 正常系
         assert utils.replace_hiragana_to_katakana(u'ふりがな') == u'フリガナ'
         assert utils.replace_hiragana_to_katakana(u'りんご') == u'リンゴ'
+
+        # 異常系 - ひらがなとカナカナが混在
+        assert utils.replace_hiragana_to_katakana(u'フリがな') == u'フリガナ'
+        assert utils.replace_hiragana_to_katakana(u'りんゴ') == u'リンゴ'
+
+        # 異常系 - 漢字混じり
+        assert utils.replace_hiragana_to_katakana(u'振り仮名') == u'振リ仮名'
+        assert utils.replace_hiragana_to_katakana(u'林檎') == u'林檎'

@@ -49,6 +49,9 @@ def replace_hiragana_to_katakana(hiragana):
     :return: カタカナのテキスト
     """
     katakana = hiragana
-    for tmp in HIRAGANA_TO_KATAKANA.keys():
-        katakana = katakana.replace(tmp, HIRAGANA_TO_KATAKANA[tmp])
+    for old in hiragana:
+        new = HIRAGANA_TO_KATAKANA.get(old)
+        if not new:
+            continue
+        katakana = katakana.replace(old, new)
     return katakana
