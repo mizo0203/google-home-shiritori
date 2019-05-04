@@ -48,10 +48,11 @@ def replace_hiragana_to_katakana(hiragana):
     :rtype: unicode
     :return: カタカナのテキスト
     """
-    katakana = hiragana
+    katakana = u''
     for old in hiragana:
         new = HIRAGANA_TO_KATAKANA.get(old)
         if not new:
-            continue
-        katakana = katakana.replace(old, new)
+            katakana += old
+        else:
+            katakana += new
     return katakana
