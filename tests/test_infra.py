@@ -1,6 +1,6 @@
 # -*- coding: UTF-8 -*-
 
-# Copyright 2018 [name of copyright owner]
+# Copyright 2019 Hayato Kubo / Takanori Kondo / Satoki Mizoguchi
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -54,7 +54,3 @@ class TestInfra(unittest.TestCase):
         assert infra.search_reading_from_dic(u'溝口', u'ミゾグチ', json_dic) == {}
         assert infra.search_reading_from_dic(u'溝口', u'', json_dic) == {}
         assert infra.search_reading_from_dic(u'', u'ミゾグチ', json_dic) == {}
-
-    def test_replace_hiragana_to_katakana(self):
-        assert infra.replace_hiragana_to_katakana(u'ふりがな') == u'フリガナ'
-        assert infra.replace_hiragana_to_katakana(u'りんご') == u'リンゴ'
