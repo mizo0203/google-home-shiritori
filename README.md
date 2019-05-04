@@ -67,5 +67,4 @@ Copyright (c) 2016-present [Anilogia](https://github.com/anilogia/)
 * Google Home および Google アシスタントは Google LLC の商標です。
 * その他、記載されている会社名、製品名、サービス名は、各社の登録商標または商標です。
 
-© 2019 [Hayato Kubo](https://github.com/hayatedayon) / [Takanori Kondo](https://github.com/tKondoYDC) / [Satoki Mizoguchi](https://github.com/mizo0203),  
-Licensed under the [Apache License, Version 2.0](LICENSE).
+© 2019 [Hayato Kubo](https://github.com/hayatedayon) / [Takanori Kondo](https://github.com/tKondoYDC) / [Satoki Mizoguchi](https://github.com/mizo0203), Licensed under the [Apache License, Version 2.0](LICENSE).
